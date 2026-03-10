@@ -184,14 +184,13 @@ export default function App() {
       `}</style>
 
       {/* HEADER */}
-      <div style={{ background: T.surface, borderBottom: `1px solid ${T.border}`, padding: "14px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
           <div style={{ background: T.green, color: "#000", fontSize: 9, letterSpacing: "2.5px", fontWeight: 700, padding: "4px 10px" }}>LIVE</div>
-          <div>
-            <div style={{ fontSize: 15, fontWeight: 700, color: T.bright, letterSpacing: 0.5 }}>AFROCENTRIC GROUP</div>
-            <div style={{ fontSize: 9, color: T.muted, letterSpacing: "1.5px" }}>SOCIAL & MEDIA INTELLIGENCE MONITOR — JSE:ACT</div>
-          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <img src="/logo.png" alt="AfroCentric Group" style={{ height: 36 }} />
+      <div style={{ fontSize: 9, color: T.muted, letterSpacing: "1.5px" }}>SOCIAL & MEDIA INTELLIGENCE MONITOR — JSE:ACT</div>
         </div>
+      </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           {fetchedAt[activeId] && <span style={{ fontSize: 9, color: T.muted }}>FETCHED {fetchedAt[activeId]}</span>}
           <button className="btn" onClick={() => fetchIntelligence(activeQuery, true)} disabled={loading || rateLimited}
