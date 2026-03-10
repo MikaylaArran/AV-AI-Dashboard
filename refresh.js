@@ -1,3 +1,12 @@
+const QUERIES = [
+  { id: "general",   label: "General Buzz",       query: "AfroCentric Group South Africa 2026 news public discussion opinions" },
+  { id: "financial", label: "Financial Sentiment", query: "AfroCentric Group JSE ACT share price results investor reaction 2025 2026" },
+  { id: "nhi",       label: "NHI & Policy",        query: "AfroCentric NHI National Health Insurance South Africa 2025 2026 public opinion" },
+  { id: "medscheme", label: "Medscheme Chatter",   query: "Medscheme AfroCentric complaints reviews member opinions 2025 2026" },
+  { id: "employer",  label: "Employer Reputation", query: "AfroCentric Group employer culture employee reviews 2025 South Africa" },
+  { id: "digital",   label: "Digital & AI",        query: "AfroCentric digital transformation AI health tech South Africa 2025 2026" },
+];
+
 const SYSTEM_PROMPT = `You are a professional social and media intelligence analyst specialising in South African healthcare. Search the web for recent public conversations, news, social media posts, reviews, and commentary about AfroCentric Group (JSE:ACT).
 
 Return ONLY a valid JSON object with NO markdown, NO backticks, NO preamble. Exactly this structure:
@@ -27,16 +36,6 @@ Return ONLY a valid JSON object with NO markdown, NO backticks, NO preamble. Exa
   "dataQuality": "HIGH" or "MEDIUM" or "LOW",
   "sourceCount": integer
 }`;
-
-async function redisGet(key) {
-  const url = process.env.STORAGE_URL;
-  const token = process.env.STORAGE_TOKEN;
-  const res = await fetch(`${url}/get/${key}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  const data = await res.json();
-  return data.result ? JSON.parse(data.result) : null;
-}
 
 async function redisSet(key, value) {
   const url = process.env.STORAGE_URL;
@@ -68,37 +67,31 @@ async function fetchFromClaude(label, query) {
     })
   });
 
-  if (!response.ok) {
-    const err = await response.text();
-    throw new Error(`Claude API ${response.status}: ${err.slice(0, 300)}`);
-  }
-
+  if (!response.ok) throw new Error(`Claude API ${response.status}`);
   const raw = await response.json();
   const textBlocks = (raw.content || []).filter(b => b.type === "text");
-  if (!textBlocks.length) throw new Error("No text response from Claude");
   const fullText = textBlocks.map(b => b.text).join("\n");
   const match = fullText.match(/\{[\s\S]*\}/);
-  if (!match) throw new Error("No JSON found in response");
+  if (!match) throw new Error("No JSON in response");
   return JSON.parse(match[0]);
 }
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
-  if (!process.env.ANTHROPIC_API_KEY) return res.status(500).json({ error: "API key not configured" });
-
-  const { id, label, query, force } = req.body;
-
-  try {
-    if (!force) {
-      const cached = await redisGet(`intel_${id}`);
-      if (cached) return res.status(200).json({ ...cached, fromCache: true });
-    }
-
-    const data = await fetchFromClaude(label, query);
-    await redisSet(`intel_${id}`, { ...data, cachedAt: new Date().toISOString() });
-    return res.status(200).json({ ...data, fromCache: false });
-
-  } catch (e) {
-    return res.status(500).json({ error: e.message });
+  if (req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) {
+    return res.status(401).json({ error: "Unauthorised" });
   }
+
+  const results = [];
+  for (const q of QUERIES) {
+    try {
+      const data = await fetchFromClaude(q.label, q.query);
+      await redisSet(`intel_${q.id}`, { ...data, cachedAt: new Date().toISOString() });
+      results.push({ id: q.id, status: "ok" });
+      await new Promise(r => setTimeout(r, 3000));
+    } catch (e) {
+      results.push({ id: q.id, status: "error", error: e.message });
+    }
+  }
+
+  return res.status(200).json({ message: "Refresh complete", completedAt: new Date().toISOString(), results });
 }
