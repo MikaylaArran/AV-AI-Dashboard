@@ -123,7 +123,11 @@ export default function App() {
   const activeQuery = QUERIES.find(q => q.id === activeId);
   const data = results[activeId] || null;
 
-  const CACHE_DURATION_MS = 6 * 60 * 60 * 1000; // 6 hours
+ const now = new Date();
+const next6am = new Date(now);
+next6am.setHours(6, 0, 0, 0);
+if (next6am <= now) next6am.setDate(next6am.getDate() + 1);
+const CACHE_DURATION_MS = next6am - now;
 
   function loadFromStorage(id) {
     try {
