@@ -30,42 +30,43 @@ Return ONLY a valid JSON object with NO markdown, NO backticks, NO preamble. Exa
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
-  if (!process.env.ANTHROPIC_API_KEY) return res.status(500).json({ error: "API key not configured" });
+  if (!process.env.GEMINI_API_KEY) return res.status(500).json({ error: "API key not configured" });
 
-  const { id, label, query } = req.body;
+  const { label, query } = req.body;
 
   try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": process.env.ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1500,
-        system: SYSTEM_PROMPT,
-        tools: [{ type: "web_search_20250305", name: "web_search" }],
-        messages: [{
-          role: "user",
-          content: `Search the web and analyse public conversations about AfroCentric Group for this topic: "${label}". Search query: "${query}". Focus on results from 2025-2026. Return only the JSON object.`
-        }]
-      })
-    });
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: `${SYSTEM_PROMPT}\n\nSearch the web and analyse public conversations about AfroCentric Group for this topic: "${label}". Search query: "${query}". Focus on results from 2025-2026. Return only the JSON object.`
+            }]
+          }],
+          tools: [{ google_search: {} }],
+          generationConfig: {
+            temperature: 0.3,
+            maxOutputTokens: 2000,
+          }
+        })
+      }
+    );
 
-    if (res.status === 429) return res.status(429).json({ error: "Rate limited" });
     if (!response.ok) {
       const err = await response.text();
-      throw new Error(`Claude API ${response.status}: ${err.slice(0, 300)}`);
+      throw new Error(`Gemini API ${response.status}: ${err.slice(0, 300)}`);
     }
 
     const raw = await response.json();
-    const textBlocks = (raw.content || []).filter(b => b.type === "text");
-    if (!textBlocks.length) throw new Error("No text response from Claude");
-    const fullText = textBlocks.map(b => b.text).join("\n");
-    const match = fullText.match(/\{[\s\S]*\}/);
+    const text = raw.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) throw new Error("No text response from Gemini");
+
+    const match = text.match(/\{[\s\S]*\}/);
     if (!match) throw new Error("No JSON found in response");
+
     const parsed = JSON.parse(match[0]);
     return res.status(200).json({ ...parsed, cachedAt: new Date().toISOString() });
 
