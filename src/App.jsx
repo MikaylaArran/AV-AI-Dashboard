@@ -168,7 +168,24 @@ function Tag({ label, color }) {
 
 export default function App() {
   const [activeId, setActiveId] = useState("general");
-  const [results, setResults] = useState(STATIC_DATA);
+  const [results, setResults] = useState(() => {
+    // On first load, try to hydrate from localStorage — fall back to static
+    const hydrated = {};
+    QUERIES.forEach(q => {
+      try {
+        const raw = localStorage.getItem(`intel_${q.id}`);
+        if (raw) {
+          const { data } = JSON.parse(raw);
+          hydrated[q.id] = data;
+        } else {
+          hydrated[q.id] = STATIC_DATA[q.id];
+        }
+      } catch {
+        hydrated[q.id] = STATIC_DATA[q.id];
+      }
+    });
+    return hydrated;
+  });
   const [loading, setLoading] = useState(false);
   const [isLive, setIsLive] = useState(false);
   const [fetchedAt, setFetchedAt] = useState({});
@@ -182,7 +199,7 @@ export default function App() {
 
   function loadFromStorage(id) {
     try {
-      const raw = sessionStorage.getItem(`intel_${id}`);
+      const raw = localStorage.getItem(`intel_${id}`);
       if (!raw) return null;
       const { data, timestamp } = JSON.parse(raw);
       if (Date.now() - timestamp > CACHE_DURATION_MS) return null;
@@ -192,7 +209,7 @@ export default function App() {
 
   function saveToStorage(id, data) {
     try {
-      sessionStorage.setItem(`intel_${id}`, JSON.stringify({ data, timestamp: Date.now() }));
+      localStorage.setItem(`intel_${id}`, JSON.stringify({ data, timestamp: Date.now() }));
     } catch {}
   }
 
