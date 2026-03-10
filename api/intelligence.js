@@ -28,75 +28,46 @@ Return ONLY a valid JSON object with NO markdown, NO backticks, NO preamble. Exa
   "sourceCount": integer
 }`;
 
-async function redisGet(key) {
-  const url = process.env.STORAGE_URL;
-  const token = process.env.STORAGE_TOKEN;
-  const res = await fetch(`${url}/get/${key}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  const data = await res.json();
-  return data.result ? JSON.parse(data.result) : null;
-}
-
-async function redisSet(key, value) {
-  const url = process.env.STORAGE_URL;
-  const token = process.env.STORAGE_TOKEN;
-  await fetch(`${url}/set/${key}`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify(JSON.stringify(value))
-  });
-}
-
-async function fetchFromClaude(label, query) {
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": process.env.ANTHROPIC_API_KEY,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 1500,
-      system: SYSTEM_PROMPT,
-      tools: [{ type: "web_search_20250305", name: "web_search" }],
-      messages: [{
-        role: "user",
-        content: `Search the web and analyse public conversations about AfroCentric Group for this topic: "${label}". Search query: "${query}". Focus on results from 2025-2026. Return only the JSON object.`
-      }]
-    })
-  });
-
-  if (!response.ok) {
-    const err = await response.text();
-    throw new Error(`Claude API ${response.status}: ${err.slice(0, 300)}`);
-  }
-
-  const raw = await response.json();
-  const textBlocks = (raw.content || []).filter(b => b.type === "text");
-  if (!textBlocks.length) throw new Error("No text response from Claude");
-  const fullText = textBlocks.map(b => b.text).join("\n");
-  const match = fullText.match(/\{[\s\S]*\}/);
-  if (!match) throw new Error("No JSON found in response");
-  return JSON.parse(match[0]);
-}
-
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
   if (!process.env.ANTHROPIC_API_KEY) return res.status(500).json({ error: "API key not configured" });
 
-  const { id, label, query, force } = req.body;
+  const { id, label, query } = req.body;
 
   try {
-    if (!force) {
-      const cached = await redisGet(`intel_${id}`);
-      if (cached) return res.status(200).json({ ...cached, fromCache: true });
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": process.env.ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1500,
+        system: SYSTEM_PROMPT,
+        tools: [{ type: "web_search_20250305", name: "web_search" }],
+        messages: [{
+          role: "user",
+          content: `Search the web and analyse public conversations about AfroCentric Group for this topic: "${label}". Search query: "${query}". Focus on results from 2025-2026. Return only the JSON object.`
+        }]
+      })
+    });
+
+    if (res.status === 429) return res.status(429).json({ error: "Rate limited" });
+    if (!response.ok) {
+      const err = await response.text();
+      throw new Error(`Claude API ${response.status}: ${err.slice(0, 300)}`);
     }
 
-    const data = await fetchFromClaude(label, query);
-    await redisSet(`intel_${id}`, { ...data, cachedAt: new Date().toISOString() });
-    return res.status(200).json({ ...data, fromCache: false });
+    const raw = await response.json();
+    const textBlocks = (raw.content || []).filter(b => b.type === "text");
+    if (!textBlocks.length) throw new Error("No text response from Claude");
+    const fullText = textBlocks.map(b => b.text).join("\n");
+    const match = fullText.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error("No JSON found in response");
+    const parsed = JSON.parse(match[0]);
+    return res.status(200).json({ ...parsed, cachedAt: new Date().toISOString() });
 
   } catch (e) {
     return res.status(500).json({ error: e.message });
