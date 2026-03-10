@@ -8,6 +8,9 @@ const T = {
   blue: "#3A9EFF", purple: "#9B6DFF",
 };
 
+const SUPABASE_URL = "https://gwunhnjbfqxwjtpqjged.supabase.co";
+const SUPABASE_KEY = "sb_publishable_ongjxWYCZd76H-0xPTu71w_nAM8GdHx";
+
 const QUERIES = [
   { id: "general",   label: "General Buzz",       icon: "◈", query: "AfroCentric Group South Africa 2026 news public discussion opinions" },
   { id: "financial", label: "Financial Sentiment", icon: "◎", query: "AfroCentric Group JSE ACT share price results investor reaction 2025 2026" },
@@ -23,7 +26,7 @@ const STATIC_DATA = {
     oneLiner: "AfroCentric dominates SA healthcare headlines with a turbulent FY2025 marked by massive impairments, a high-stakes legal battle with Bonitas, and strategic narrowing under Sanlam's control.",
     themes: [
       { theme: "FY2025 Financial Results", sentiment: "NEGATIVE", what: "Revenue grew 93.9% to R7.3bn but the group swung to a R1.27bn basic loss due to massive asset impairments. Markets reacted negatively; the share hit an all-time low of 90 ZAC in February 2026.", sources: ["Business Day", "MarketScreener"], representative_voice: "The headline earnings recovery to R117m is being buried under R1.59bn in write-downs — investors are asking what they actually own." },
-      { theme: "Bonitas Legal Dispute", sentiment: "NEGATIVE", what: "Medscheme filed an urgent interdict in December 2025 to block Bonitas from replacing them as administrator. The Gauteng Local Division heard the matter on 3 March 2026. At stake: ~1 million members and ~R20bn in annual contributions.", sources: ["TimesLive", "Medical Brief"], representative_voice: "This is the biggest administration contract dispute in SA medical scheme history — and it's very public." },
+      { theme: "Bonitas Legal Dispute", sentiment: "NEGATIVE", what: "Medscheme filed an urgent interdict to block Bonitas from replacing them as administrator. The Gauteng Local Division heard the matter on 3 March 2026. At stake: ~1 million members and ~R20bn in annual contributions.", sources: ["TimesLive", "Medical Brief"], representative_voice: "This is the biggest administration contract dispute in SA medical scheme history — and it's very public." },
       { theme: "Portfolio Restructuring", sentiment: "NEUTRAL", what: "AfroCentric is exiting Activo and has sold ADS Group and Wellworx to Sanlam Life. The market is watching whether focus on core health admin will translate into profitability.", sources: ["AfroCentric AFS 2025", "Business Day"], representative_voice: "Simplifying the structure makes strategic sense, but the execution costs are painful." },
       { theme: "NHI Positioning", sentiment: "CAUTIOUS", what: "The group publicly supports NHI principles but flags implementation concerns. Pharmacy Direct's CCMDD contract (1.4m scripts/month) positions them as already embedded in public health delivery.", sources: ["AfroCentric IAR", "BHF"], representative_voice: "They're hedging smartly — one foot in private, one foot in public." },
     ],
@@ -39,13 +42,13 @@ const STATIC_DATA = {
     overallSentiment: "NEGATIVE", sentimentScore: 28, volumeSignal: "HIGH", dataQuality: "HIGH",
     oneLiner: "JSE:ACT is trading near historic lows as investors digest a R1.27bn basic loss, no dividend, and a binary legal risk in the Bonitas dispute.",
     themes: [
-      { theme: "Share Price & Investor Reaction", sentiment: "NEGATIVE", what: "ACT.JO hit 90 ZAC on 19 Feb 2026 — an all-time low — and has recovered modestly to 124 ZAC. Month-on-month the stock is down 22.76%. No dividend was declared for 2025 versus 6c/share in the prior period.", sources: ["JSE", "MarketScreener"], representative_voice: "No dividend, R1.5bn in write-downs, and a legal battle with your biggest client — the market repricing makes sense." },
-      { theme: "Headline vs Basic Earnings", sentiment: "MIXED", what: "Headline earnings recovered to R117.1m (13.92c/share) but basic loss was R1.27bn (151.55c/share), driven by ~R1.59bn in asset impairments including Pharmacy Direct, Activo, and TendaHealth.", sources: ["AfroCentric AFS 2025"], representative_voice: "Headline earnings are the real number to track — and R117m on R7.3bn revenue is thin but not catastrophic." },
-      { theme: "Sanlam Stake Dynamics", sentiment: "NEUTRAL", what: "Sanlam holds 59% of AfroCentric and has absorbed ADS Group and Wellworx. The relationship provides financial backstop but raises questions about AfroCentric's strategic independence.", sources: ["Sanlam filings", "AfroCentric AFS"], representative_voice: "Sanlam is effectively calling the shots — minority shareholders are along for the ride." },
+      { theme: "Share Price & Investor Reaction", sentiment: "NEGATIVE", what: "ACT.JO hit 90 ZAC on 19 Feb 2026 — an all-time low — and has recovered modestly to 124 ZAC. Month-on-month the stock is down 22.76%. No dividend was declared for 2025.", sources: ["JSE", "MarketScreener"], representative_voice: "No dividend, R1.5bn in write-downs, and a legal battle with your biggest client — the market repricing makes sense." },
+      { theme: "Headline vs Basic Earnings", sentiment: "MIXED", what: "Headline earnings recovered to R117.1m (13.92c/share) but basic loss was R1.27bn driven by ~R1.59bn in asset impairments including Pharmacy Direct, Activo, and TendaHealth.", sources: ["AfroCentric AFS 2025"], representative_voice: "Headline earnings are the real number to track — and R117m on R7.3bn revenue is thin but not catastrophic." },
+      { theme: "Sanlam Stake Dynamics", sentiment: "NEUTRAL", what: "Sanlam holds 59% of AfroCentric and has absorbed ADS Group and Wellworx. The relationship provides financial backstop but raises questions about strategic independence.", sources: ["Sanlam filings", "AfroCentric AFS"], representative_voice: "Sanlam is effectively calling the shots — minority shareholders are along for the ride." },
     ],
     topVoices: [
-      { type: "Investor", sentiment: "negative", quote: "The loss before tax of R532m versus a prior profit of R225m is a dramatic reversal — I want to see a clear path back to profitability before re-entering." },
-      { type: "Analyst", sentiment: "cautious", quote: "Headline earnings of R117m on a R7.3bn revenue base suggests the core business is intact — the impairments were largely non-cash restructuring costs." },
+      { type: "Investor", sentiment: "negative", quote: "The loss before tax of R532m versus a prior profit of R225m is a dramatic reversal." },
+      { type: "Analyst", sentiment: "cautious", quote: "Headline earnings of R117m on a R7.3bn revenue base suggests the core business is intact." },
       { type: "Media", sentiment: "negative", quote: "AfroCentric's share has underperformed the JSE Healthcare index significantly year-to-date." },
     ],
     watchPoints: ["FY2026 guidance — will management provide clarity on path to dividend reinstatement?", "Bonitas outcome — material revenue risk if Medscheme contract is not renewed", "Activo disposal completion — remaining impairment exposure"],
@@ -55,9 +58,9 @@ const STATIC_DATA = {
     overallSentiment: "CAUTIOUS", sentimentScore: 48, volumeSignal: "MEDIUM", dataQuality: "MEDIUM",
     oneLiner: "AfroCentric is positioning as NHI-ready through its CCMDD public sector footprint, while acknowledging the policy remains a long-term structural uncertainty.",
     themes: [
-      { theme: "Public Sector Footprint", sentiment: "POSITIVE", what: "Pharmacy Direct administers 1.4 million CCMDD scripts per month for the NDoH — one of the largest public-private health delivery partnerships in SA. A backdated price adjustment was secured, improving contract economics.", sources: ["AfroCentric IAR 2025", "NDoH"], representative_voice: "Pharmacy Direct is already doing NHI-style delivery at scale — that's a genuine moat if the policy matures." },
-      { theme: "NHI Implementation Risk", sentiment: "CAUTIOUS", what: "AfroCentric publicly supports NHI principles but calls for greater stakeholder consultation on implementation timelines and benefit design. NHI uncertainty is cited as a strategic risk in the AFS.", sources: ["AfroCentric AFS 2025", "BHF"], representative_voice: "The NHI Act is law but the funding model is still unknown — no one can plan meaningfully until that's resolved." },
-      { theme: "Medscheme as NHI Bridge", sentiment: "NEUTRAL", what: "Medscheme's 4.08 million lives under management and its managed care capabilities position it as a potential NHI benefit management vehicle. The group is actively engaging with CMS and policy stakeholders.", sources: ["AfroCentric IAR 2025"], representative_voice: "Medscheme has the infrastructure, the clinical data, and the relationships — the question is whether government wants to use it." },
+      { theme: "Public Sector Footprint", sentiment: "POSITIVE", what: "Pharmacy Direct administers 1.4 million CCMDD scripts per month for the NDoH — one of the largest public-private health delivery partnerships in SA.", sources: ["AfroCentric IAR 2025", "NDoH"], representative_voice: "Pharmacy Direct is already doing NHI-style delivery at scale — that's a genuine moat if the policy matures." },
+      { theme: "NHI Implementation Risk", sentiment: "CAUTIOUS", what: "AfroCentric publicly supports NHI principles but calls for greater stakeholder consultation on implementation timelines and benefit design.", sources: ["AfroCentric AFS 2025", "BHF"], representative_voice: "The NHI Act is law but the funding model is still unknown — no one can plan meaningfully until that's resolved." },
+      { theme: "Medscheme as NHI Bridge", sentiment: "NEUTRAL", what: "Medscheme's 4.08 million lives under management and its managed care capabilities position it as a potential NHI benefit management vehicle.", sources: ["AfroCentric IAR 2025"], representative_voice: "Medscheme has the infrastructure, the clinical data, and the relationships — the question is whether government wants to use it." },
     ],
     topVoices: [
       { type: "Regulator", sentiment: "neutral", quote: "The CMS Section 43 inquiry into the Bonitas tender process concluded in November 2025 with findings that warrant further investigation." },
@@ -71,13 +74,13 @@ const STATIC_DATA = {
     overallSentiment: "MIXED", sentimentScore: 44, volumeSignal: "HIGH", dataQuality: "HIGH",
     oneLiner: "Medscheme dominates conversation for operational scale and the explosive Bonitas dispute — member sentiment is mixed, with service improvements noted but the legal battle creating reputational noise.",
     themes: [
-      { theme: "Bonitas Administration Dispute", sentiment: "NEGATIVE", what: "Medscheme filed an urgent interdict to halt Bonitas from running a tender for a new administrator. Allegations involve a former ADS CEO and a former AfroCentric executive in an alleged conflict of interest network. The matter was heard on 3 March 2026.", sources: ["TimesLive", "Medical Brief", "Bonitas statement"], representative_voice: "Members just want certainty — the idea that their scheme's admin could change overnight is unsettling." },
-      { theme: "Service Delivery", sentiment: "MIXED", what: "Automated hospital approval systems went live across major hospital groups, reducing turnaround from hours to minutes. However, legacy complaints about claims processing delays continue to surface on social media.", sources: ["AfroCentric IAR", "HelloPeter"], representative_voice: "The new authorisation system is genuinely fast — that's a real improvement. But billing disputes are still a nightmare." },
-      { theme: "Lives Under Management", sentiment: "POSITIVE", what: "Medscheme administers 4.08 million lives across 14 medical scheme clients, reflecting 3% growth. It remains the largest medical scheme administrator in South Africa by membership.", sources: ["AfroCentric IAR 2025"], representative_voice: "The scale is undeniable — no competitor can replicate Medscheme's client base or data assets quickly." },
+      { theme: "Bonitas Administration Dispute", sentiment: "NEGATIVE", what: "Medscheme filed an urgent interdict to halt Bonitas from running a tender for a new administrator. The matter was heard on 3 March 2026. At stake: ~1 million members and ~R20bn in contributions.", sources: ["TimesLive", "Medical Brief", "Bonitas statement"], representative_voice: "Members just want certainty — the idea that their scheme's admin could change overnight is unsettling." },
+      { theme: "Service Delivery", sentiment: "MIXED", what: "Automated hospital approval systems went live across major hospital groups, reducing turnaround from hours to minutes. However, legacy complaints about claims processing delays continue on social media.", sources: ["AfroCentric IAR", "HelloPeter"], representative_voice: "The new authorisation system is genuinely fast. But billing disputes are still a nightmare." },
+      { theme: "Lives Under Management", sentiment: "POSITIVE", what: "Medscheme administers 4.08 million lives across 14 medical scheme clients, reflecting 3% growth. It remains the largest medical scheme administrator in South Africa.", sources: ["AfroCentric IAR 2025"], representative_voice: "The scale is undeniable — no competitor can replicate Medscheme's client base or data assets quickly." },
     ],
     topVoices: [
       { type: "Member", sentiment: "mixed", quote: "Pre-authorisations are faster now, but I still get contradictory information from different call centre agents." },
-      { type: "Media", sentiment: "negative", quote: "The Bonitas dispute is the biggest administrator scandal in SA medical scheme history — and it's very public." },
+      { type: "Media", sentiment: "negative", quote: "The Bonitas dispute is the biggest administrator scandal in SA medical scheme history." },
       { type: "Analyst", sentiment: "positive", quote: "Medscheme's 4m+ lives and data depth make it an irreplaceable infrastructure asset in SA healthcare." },
     ],
     watchPoints: ["Bonitas contract outcome — loss would be a significant revenue and reputational blow", "Member complaints trend on HelloPeter and social media", "CMS investigation findings and potential regulatory action"],
@@ -87,16 +90,16 @@ const STATIC_DATA = {
     overallSentiment: "POSITIVE", sentimentScore: 67, volumeSignal: "MEDIUM", dataQuality: "MEDIUM",
     oneLiner: "AfroCentric holds its Top Employer 2025 certification and maintains positive LinkedIn engagement, though restructuring-related uncertainty is creating internal noise.",
     themes: [
-      { theme: "Top Employer Certification", sentiment: "POSITIVE", what: "AfroCentric retained its Top Employer South Africa 2025 certification. LinkedIn engagement from employees reflects pride in the certification, with positive posts about culture and development programmes.", sources: ["Top Employers Institute", "LinkedIn"], representative_voice: "Proud to work for a Top Employer — the leadership development programmes are genuinely world-class." },
-      { theme: "Restructuring Uncertainty", sentiment: "MIXED", what: "The Activo exit and disposal of ADS Group and Wellworx created uncertainty among employees in those divisions. LinkedIn activity shows some departures but also internal mobility into the core Medscheme and AfroCentric Technologies teams.", sources: ["LinkedIn", "Glassdoor"], representative_voice: "The restructuring was necessary but communication could have been better — a lot of people didn't know their fate until very late." },
-      { theme: "New Leadership", sentiment: "POSITIVE", what: "Lindiwe Miyambu joined as Chief People & Marketing Officer in October 2025. Early employee feedback is positive, with increased visibility of people initiatives and internal communications.", sources: ["LinkedIn", "AfroCentric IAR"], representative_voice: "Lindiwe's appointment has energised the HR function — there's a sense of real focus on culture now." },
+      { theme: "Top Employer Certification", sentiment: "POSITIVE", what: "AfroCentric retained its Top Employer South Africa 2025 certification. LinkedIn engagement from employees reflects pride in the certification and development programmes.", sources: ["Top Employers Institute", "LinkedIn"], representative_voice: "Proud to work for a Top Employer — the leadership development programmes are genuinely world-class." },
+      { theme: "Restructuring Uncertainty", sentiment: "MIXED", what: "The Activo exit and disposal of ADS Group and Wellworx created uncertainty among employees in those divisions. LinkedIn shows some departures but also internal mobility.", sources: ["LinkedIn", "Glassdoor"], representative_voice: "The restructuring was necessary but communication could have been better." },
+      { theme: "New Leadership", sentiment: "POSITIVE", what: "Lindiwe Miyambu joined as Chief People & Marketing Officer in October 2025. Early employee feedback is positive with increased visibility of people initiatives.", sources: ["LinkedIn", "AfroCentric IAR"], representative_voice: "Lindiwe's appointment has energised the HR function — there's a sense of real focus on culture now." },
     ],
     topVoices: [
       { type: "Employee", sentiment: "positive", quote: "The digital transformation work is genuinely exciting — we're building things that directly affect patient outcomes." },
       { type: "Employee", sentiment: "mixed", quote: "Job security concerns post-Activo exit are real for people in affected divisions." },
       { type: "Media", sentiment: "positive", quote: "AfroCentric's Top Employer retention is notable given the scale of restructuring underway." },
     ],
-    watchPoints: ["Employee retention in technology and clinical functions during restructuring", "Glassdoor review trends following Activo disposal", "Culture impact of Sanlam integration and rebranding of Corporate Solutions"],
+    watchPoints: ["Employee retention in technology and clinical functions during restructuring", "Glassdoor review trends following Activo disposal", "Culture impact of Sanlam integration"],
     sourceCount: 9,
   },
   digital: {
@@ -109,7 +112,7 @@ const STATIC_DATA = {
     ],
     topVoices: [
       { type: "Analyst", sentiment: "positive", quote: "AfroCentric Technologies connecting millions of members, doctors, and hospitals is a genuine network effect that's hard to replicate." },
-      { type: "Employee", sentiment: "positive", quote: "The AI diagnostics project is the most exciting technical work I've done in my career — and it has direct patient impact." },
+      { type: "Employee", sentiment: "positive", quote: "The AI diagnostics project is the most exciting technical work I've done in my career." },
       { type: "Media", sentiment: "cautious", quote: "The digital ambitions are credible but the financial results need to improve before the market will reward the innovation narrative." },
     ],
     watchPoints: ["Sanlam IT integration timeline and dependency risks", "AI diagnostics clinical validation and regulatory pathway", "2030 value-based care targets — will management quantify these?"],
@@ -153,7 +156,6 @@ function Spinner() {
     <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:20, padding:"80px 0" }}>
       <div style={{ width:36, height:36, border:`2px solid ${T.border2}`, borderTop:`2px solid ${T.green}`, borderRadius:"50%", animation:"spin 0.9s linear infinite" }} />
       <div style={{ fontSize:10, letterSpacing:"3px", color:T.dim, fontFamily:font }}>SCANNING LIVE DATA</div>
-      <div style={{ fontSize:10, color:T.muted, fontFamily:font }}>Searching web for recent conversations...</div>
     </div>
   );
 }
@@ -166,101 +168,85 @@ function Tag({ label, color }) {
   );
 }
 
+async function loadFromSupabase(id) {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/intelligence_cache?id=eq.${id}&select=data,cached_at`, {
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+    });
+    const rows = await res.json();
+    if (!rows?.length) return null;
+    return rows[0].data;
+  } catch { return null; }
+}
+
 export default function App() {
   const [activeId, setActiveId] = useState("general");
-  const [results, setResults] = useState(() => {
-    // On first load, try to hydrate from localStorage — fall back to static
-    const hydrated = {};
-    QUERIES.forEach(q => {
-      try {
-        const raw = localStorage.getItem(`intel_${q.id}`);
-        if (raw) {
-          const { data } = JSON.parse(raw);
-          hydrated[q.id] = data;
-        } else {
-          hydrated[q.id] = STATIC_DATA[q.id];
-        }
-      } catch {
-        hydrated[q.id] = STATIC_DATA[q.id];
-      }
-    });
-    return hydrated;
-  });
+  const [results, setResults] = useState(STATIC_DATA);
   const [loading, setLoading] = useState(false);
-  const [isLive, setIsLive] = useState(false);
-  const [fetchedAt, setFetchedAt] = useState({});
-  const cache = useRef({});
-  const timerRef = useRef(null);
+  const [dataSource, setDataSource] = useState({});
+  const timerRef = useRef({});
 
   const activeQuery = QUERIES.find(q => q.id === activeId);
   const data = results[activeId];
 
-  const CACHE_DURATION_MS = 24 * 60 * 60 * 1000;
+  // On mount: load from Supabase, only call Claude for tabs with no cached data
+  useEffect(() => {
+    async function init() {
+      const needsFetch = [];
+      for (const q of QUERIES) {
+        const cached = await loadFromSupabase(q.id);
+        if (cached) {
+          setResults(r => ({ ...r, [q.id]: cached }));
+          setDataSource(d => ({ ...d, [q.id]: "supabase" }));
+        } else {
+          needsFetch.push(q);
+        }
+      }
+      for (const q of needsFetch) {
+        await fetchFromClaude(q);
+        await new Promise(r => setTimeout(r, 2000));
+      }
+    }
+    init();
+  }, []);
 
-  function loadFromStorage(id) {
+  async function fetchFromClaude(queryObj) {
     try {
-      const raw = localStorage.getItem(`intel_${id}`);
-      if (!raw) return null;
-      const { data, timestamp } = JSON.parse(raw);
-      if (Date.now() - timestamp > CACHE_DURATION_MS) return null;
-      return { data, timestamp };
-    } catch { return null; }
-  }
-
-  function saveToStorage(id, data) {
-    try {
-      localStorage.setItem(`intel_${id}`, JSON.stringify({ data, timestamp: Date.now() }));
+      const res = await fetch("/api/intelligence", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: queryObj.id, label: queryObj.label, query: queryObj.query }),
+      });
+      if (!res.ok) return;
+      const parsed = await res.json();
+      setResults(r => ({ ...r, [queryObj.id]: parsed }));
+      setDataSource(d => ({ ...d, [queryObj.id]: "live" }));
     } catch {}
   }
 
   async function fetchIntelligence(queryObj, force = false) {
-    if (!force) {
-      const cached = loadFromStorage(queryObj.id);
-      if (cached) {
-        setResults(r => ({ ...r, [queryObj.id]: cached.data }));
-        setFetchedAt(f => ({ ...f, [queryObj.id]: new Date(cached.timestamp).toLocaleTimeString() }));
-        setIsLive(true);
-        return;
-      }
-    }
-
     setLoading(true);
     try {
       const res = await fetch("/api/intelligence", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ label: queryObj.label, query: queryObj.query }),
+        body: JSON.stringify({ id: queryObj.id, label: queryObj.label, query: queryObj.query, force }),
       });
-
-      if (!res.ok) {
-        // API failed — keep showing static data silently
-        setLoading(false);
-        return;
-      }
-
+      if (!res.ok) { setLoading(false); return; }
       const parsed = await res.json();
-      saveToStorage(queryObj.id, parsed);
       setResults(r => ({ ...r, [queryObj.id]: parsed }));
-      setFetchedAt(f => ({ ...f, [queryObj.id]: new Date().toLocaleTimeString() }));
-      setIsLive(true);
+      setDataSource(d => ({ ...d, [queryObj.id]: parsed.fromCache ? "supabase" : "live" }));
     } catch {
-      // Silent fail — static data stays visible
     } finally {
       setLoading(false);
     }
   }
 
-  useEffect(() => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    if (!loadFromStorage(activeId)) {
-      timerRef.current = setTimeout(() => fetchIntelligence(activeQuery), 800);
-    }
-    return () => clearTimeout(timerRef.current);
-  }, [activeId]);
+  useEffect(() => {}, [activeId]);
 
-  useEffect(() => {
-    fetchIntelligence(QUERIES[0]);
-  }, []);
+  const badge = dataSource[activeId] === "live" ? { label: "LIVE", color: T.green }
+    : dataSource[activeId] === "supabase" ? { label: "CACHED", color: T.blue }
+    : { label: "STATIC", color: T.yellow };
 
   return (
     <div style={{ background:T.bg, minHeight:"100vh", fontFamily:font, color:T.text, fontSize:12 }}>
@@ -278,8 +264,8 @@ export default function App() {
       {/* HEADER */}
       <div style={{ background:T.surface, borderBottom:`1px solid ${T.border}`, padding:"14px 24px", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
         <div style={{ display:"flex", alignItems:"center", gap:14 }}>
-          <div style={{ background:isLive ? T.green : T.yellow, color:"#000", fontSize:9, letterSpacing:"2.5px", fontWeight:700, padding:"4px 10px" }}>
-            {isLive ? "LIVE" : "STATIC"}
+          <div style={{ background:badge.color, color:"#000", fontSize:9, letterSpacing:"2.5px", fontWeight:700, padding:"4px 10px" }}>
+            {badge.label}
           </div>
           <div style={{ display:"flex", alignItems:"center", gap:12 }}>
             <img src="/logo.png" alt="AfroCentric Group" style={{ height:36 }} />
@@ -287,8 +273,6 @@ export default function App() {
           </div>
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-          {fetchedAt[activeId] && <span style={{ fontSize:9, color:T.muted }}>LIVE DATA · {fetchedAt[activeId]}</span>}
-          {!fetchedAt[activeId] && <span style={{ fontSize:9, color:T.yellow }}>STATIC · MARCH 2026</span>}
           <button className="btn" onClick={() => fetchIntelligence(activeQuery, true)} disabled={loading}
             style={{ background:"transparent", border:`1px solid ${T.border2}`, color:T.dim, fontSize:9, letterSpacing:"1.5px", padding:"5px 14px", cursor:loading?"not-allowed":"pointer", fontFamily:font, opacity:loading?0.4:1, transition:"all 0.15s" }}>
             {loading ? "..." : "↻ REFRESH"}
@@ -320,7 +304,6 @@ export default function App() {
 
         {data && (
           <div className="fade">
-            {/* STATS */}
             <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:1, marginBottom:16, background:T.border }}>
               {[
                 { label:"OVERALL SENTIMENT", value:data.overallSentiment, color:sentimentColor(data.overallSentiment) },
@@ -336,13 +319,11 @@ export default function App() {
               ))}
             </div>
 
-            {/* ONE-LINER */}
             <div style={{ background:T.surface, borderLeft:`3px solid ${T.green}`, border:`1px solid ${T.border}`, padding:"14px 20px", marginBottom:16 }}>
               <div style={{ fontSize:9, letterSpacing:"2px", color:T.muted, marginBottom:6 }}>INTELLIGENCE SUMMARY</div>
               <div style={{ fontSize:14, color:T.bright, lineHeight:1.65 }}>{data.oneLiner}</div>
             </div>
 
-            {/* MAIN GRID */}
             <div style={{ display:"grid", gridTemplateColumns:"1fr 320px", gap:16 }}>
               <div>
                 <div style={{ fontSize:9, letterSpacing:"2px", color:T.muted, marginBottom:10 }}>CONVERSATION THEMES · {data.themes?.length||0} FOUND</div>
