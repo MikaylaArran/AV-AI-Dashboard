@@ -123,10 +123,34 @@ export default function App() {
   const activeQuery = QUERIES.find(q => q.id === activeId);
   const data = results[activeId] || null;
 
+  const CACHE_DURATION_MS = 6 * 60 * 60 * 1000; // 6 hours
+
+  function loadFromStorage(id) {
+    try {
+      const raw = sessionStorage.getItem(`intel_${id}`);
+      if (!raw) return null;
+      const { data, timestamp } = JSON.parse(raw);
+      if (Date.now() - timestamp > CACHE_DURATION_MS) return null;
+      return { data, timestamp };
+    } catch { return null; }
+  }
+
+  function saveToStorage(id, data) {
+    try {
+      sessionStorage.setItem(`intel_${id}`, JSON.stringify({ data, timestamp: Date.now() }));
+    } catch {}
+  }
+
   async function fetchIntelligence(queryObj, force = false) {
-    if (!force && cache.current[queryObj.id]) {
-      setResults(r => ({ ...r, [queryObj.id]: cache.current[queryObj.id] }));
-      return;
+    // Check session storage cache first (persists across tab switches)
+    if (!force) {
+      const cached = loadFromStorage(queryObj.id);
+      if (cached) {
+        setResults(r => ({ ...r, [queryObj.id]: cached.data }));
+        const age = new Date(cached.timestamp).toLocaleTimeString();
+        setFetchedAt(f => ({ ...f, [queryObj.id]: age }));
+        return;
+      }
     }
 
     setLoading(true);
@@ -147,7 +171,7 @@ export default function App() {
       }
 
       const parsed = await res.json();
-      cache.current[queryObj.id] = parsed;
+      saveToStorage(queryObj.id, parsed);
       setResults(r => ({ ...r, [queryObj.id]: parsed }));
       setFetchedAt(f => ({ ...f, [queryObj.id]: new Date().toLocaleTimeString() }));
 
@@ -161,7 +185,7 @@ export default function App() {
   useEffect(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
     if (!results[activeId] && !loading && !rateLimited) {
-      timerRef.current = setTimeout(() => fetchIntelligence(activeQuery), 1500);
+      timerRef.current = setTimeout(() => fetchIntelligence(activeQuery), 800);
     }
     return () => clearTimeout(timerRef.current);
   }, [activeId]);
@@ -193,7 +217,7 @@ export default function App() {
           </div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          {fetchedAt[activeId] && <span style={{ fontSize: 9, color: T.muted }}>FETCHED {fetchedAt[activeId]}</span>}
+          {fetchedAt[activeId] && <span style={{ fontSize: 9, color: T.muted }}>CACHED · UPDATES EVERY 6H · LAST {fetchedAt[activeId]}</span>}
           <button className="btn" onClick={() => fetchIntelligence(activeQuery, true)} disabled={loading || rateLimited}
             style={{ background: "transparent", border: `1px solid ${T.border2}`, color: T.dim, fontSize: 9, letterSpacing: "1.5px", padding: "5px 14px", cursor: (loading || rateLimited) ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: (loading || rateLimited) ? 0.4 : 1, transition: "all 0.15s" }}>
             ↻ REFRESH
