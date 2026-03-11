@@ -28,58 +28,21 @@ Return ONLY a valid JSON object with NO markdown, NO backticks, NO preamble. Exa
   "sourceCount": integer
 }`;
 
-const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "https://gwunhnjbfqxwjtpqjged.supabase.co";
-const SUPABASE_KEY = process.env.SUPABASE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
-const CACHE_HOURS = 24;
-
-async function getFromSupabase(id) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/intelligence_cache?id=eq.${id}&select=data,cached_at`, {
-    headers: {
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
-    }
-  });
-  const rows = await res.json();
-  if (!rows?.length) return null;
-  const row = rows[0];
-  const age = (Date.now() - new Date(row.cached_at).getTime()) / 1000 / 60 / 60;
-  if (age > CACHE_HOURS) return null;
-  return row.data;
-}
-
-async function saveToSupabase(id, data) {
-  await fetch(`${SUPABASE_URL}/rest/v1/intelligence_cache`, {
-    method: "POST",
-    headers: {
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
-      "Content-Type": "application/json",
-      Prefer: "resolution=merge-duplicates",
-    },
-    body: JSON.stringify({ id, data, cached_at: new Date().toISOString() })
-  });
-}
-
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
-  if (!process.env.ANTHROPIC_API_KEY) return res.status(500).json({ error: "API key not configured" });
 
-  const { label, query, force } = req.body;
-  const id = req.body.id;
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: "ANTHROPIC_API_KEY not set" });
+
+  const { id, label, query } = req.body;
+  if (!id || !label || !query) return res.status(400).json({ error: "Missing id, label or query" });
 
   try {
-    // Check Supabase cache first
-    if (!force && SUPABASE_KEY) {
-      const cached = await getFromSupabase(id);
-      if (cached) return res.status(200).json({ ...cached, fromCache: true });
-    }
-
-    // Fetch from Claude
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": process.env.ANTHROPIC_API_KEY,
+        "x-api-key": apiKey,
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
@@ -96,22 +59,19 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       const err = await response.text();
-      throw new Error(`Claude API ${response.status}: ${err.slice(0, 300)}`);
+      return res.status(500).json({ error: `Claude API ${response.status}: ${err.slice(0, 500)}` });
     }
 
     const raw = await response.json();
     const textBlocks = (raw.content || []).filter(b => b.type === "text");
-    if (!textBlocks.length) throw new Error("No text response from Claude");
+    if (!textBlocks.length) return res.status(500).json({ error: "No text in Claude response" });
+
     const fullText = textBlocks.map(b => b.text).join("\n");
     const match = fullText.match(/\{[\s\S]*\}/);
-    if (!match) throw new Error("No JSON found in response");
+    if (!match) return res.status(500).json({ error: "No JSON in Claude response" });
+
     const parsed = JSON.parse(match[0]);
-    const result = { ...parsed, cachedAt: new Date().toISOString() };
-
-    // Save to Supabase
-    if (SUPABASE_KEY) await saveToSupabase(id, result);
-
-    return res.status(200).json({ ...result, fromCache: false });
+    return res.status(200).json({ ...parsed, cachedAt: new Date().toISOString() });
 
   } catch (e) {
     return res.status(500).json({ error: e.message });
