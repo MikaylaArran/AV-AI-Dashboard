@@ -28,8 +28,8 @@ Return ONLY a valid JSON object with NO markdown, NO backticks, NO preamble. Exa
   "sourceCount": integer
 }`;
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://gwunhnjbfqxwjtpqjged.supabase.co";
-const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "https://gwunhnjbfqxwjtpqjged.supabase.co";
+const SUPABASE_KEY = process.env.SUPABASE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
 const CACHE_HOURS = 24;
 
 async function getFromSupabase(id) {
