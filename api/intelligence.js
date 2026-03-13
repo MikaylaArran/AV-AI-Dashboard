@@ -1,4 +1,4 @@
-const SYSTEM_PROMPT = `You are a professional social and media intelligence analyst specialising in South African healthcare. Search the web for recent public conversations, news, social media posts, reviews, and commentary about AfroCentric Group (JSE:ACT).
+const SYSTEM_PROMPT = `You are a professional technology and AI industry intelligence analyst. Search the web for recent news, research, social media discussions, expert commentary, and public conversations about artificial intelligence.
 
 Return ONLY a valid JSON object with NO markdown, NO backticks, NO preamble. Exactly this structure:
 
@@ -6,7 +6,7 @@ Return ONLY a valid JSON object with NO markdown, NO backticks, NO preamble. Exa
   "overallSentiment": "POSITIVE" or "MIXED" or "NEGATIVE" or "CAUTIOUS",
   "sentimentScore": integer 0-100,
   "volumeSignal": "HIGH" or "MEDIUM" or "LOW",
-  "oneLiner": "one sharp sentence summarising what people are saying right now",
+  "oneLiner": "one sharp sentence summarising the current state of conversation on this AI topic",
   "themes": [
     {
       "theme": "theme name",
@@ -18,8 +18,8 @@ Return ONLY a valid JSON object with NO markdown, NO backticks, NO preamble. Exa
   ],
   "topVoices": [
     {
-      "type": "Investor" or "Employee" or "Member" or "Media" or "Analyst" or "Regulator",
-      "sentiment": "positive" or "negative" or "neutral",
+      "type": "Researcher" or "Developer" or "Investor" or "Regulator" or "Media" or "Analyst",
+      "sentiment": "positive" or "negative" or "neutral" or "cautious",
       "quote": "paraphrased sentiment from this type of voice"
     }
   ],
@@ -52,7 +52,7 @@ export default async function handler(req, res) {
         tools: [{ type: "web_search_20250305", name: "web_search" }],
         messages: [{
           role: "user",
-          content: `Search the web and analyse public conversations about AfroCentric Group for this topic: "${label}". Search query: "${query}". Focus on results from 2025-2026. Return only the JSON object.`
+          content: `Search the web and analyse current global conversations, news, and expert opinion about this AI topic: "${label}". Search query: "${query}". Focus on results from 2025-2026. Return only the JSON object.`
         }]
       })
     });

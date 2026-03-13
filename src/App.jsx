@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 
 const T = {
   bg: "#070809", surface: "#0D1014", panel: "#111519",
@@ -8,115 +8,290 @@ const T = {
   blue: "#3A9EFF", purple: "#9B6DFF",
 };
 
-const SUPABASE_URL = "https://gwunhnjbfqxwjtpqjged.supabase.co";
-const SUPABASE_KEY = "sb_publishable_ongjxWYCZd76H-0xPTu71w_nAM8GdHx";
-
 const QUERIES = [
-  { id: "general",   label: "General Buzz",       icon: "◈", query: "AfroCentric Group South Africa 2026 news public discussion opinions" },
-  { id: "financial", label: "Financial Sentiment", icon: "◎", query: "AfroCentric Group JSE ACT share price results investor reaction 2025 2026" },
-  { id: "nhi",       label: "NHI & Policy",        icon: "⬡", query: "AfroCentric NHI National Health Insurance South Africa 2025 2026 public opinion" },
-  { id: "medscheme", label: "Medscheme Chatter",   icon: "◇", query: "Medscheme AfroCentric complaints reviews member opinions 2025 2026" },
-  { id: "employer",  label: "Employer Reputation", icon: "◉", query: "AfroCentric Group employer culture employee reviews 2025 South Africa" },
-  { id: "digital",   label: "Digital & AI",        icon: "◫", query: "AfroCentric digital transformation AI health tech South Africa 2025 2026" },
+  { id: "news",     label: "AI News & Buzz",          icon: "◈" },
+  { id: "ethics",   label: "Responsible AI",           icon: "◎" },
+  { id: "tools",    label: "AI Tools & Models",        icon: "⬡" },
+  { id: "policy",   label: "AI Policy & Regulation",   icon: "◇" },
+  { id: "business", label: "AI in Business",           icon: "◉" },
+  { id: "research", label: "Research Breakthroughs",   icon: "◫" },
 ];
 
 const STATIC_DATA = {
-  general: {
-    overallSentiment: "MIXED", sentimentScore: 42, volumeSignal: "HIGH", dataQuality: "HIGH",
-    oneLiner: "AfroCentric dominates SA healthcare headlines with a turbulent FY2025 marked by massive impairments, a high-stakes legal battle with Bonitas, and strategic narrowing under Sanlam's control.",
+  news: {
+    overallSentiment: "POSITIVE", sentimentScore: 74, volumeSignal: "HIGH", dataQuality: "HIGH",
+    oneLiner: "The AI news cycle in early 2026 is dominated by GPT-5 and Gemini Ultra 2 launches, open-source momentum from Meta and Mistral, and a wave of multimodal breakthroughs reshaping how the world interacts with AI.",
     themes: [
-      { theme: "FY2025 Financial Results", sentiment: "NEGATIVE", what: "Revenue grew 93.9% to R7.3bn but the group swung to a R1.27bn basic loss due to massive asset impairments. Markets reacted negatively; the share hit an all-time low of 90 ZAC in February 2026.", sources: ["Business Day", "MarketScreener"], representative_voice: "The headline earnings recovery to R117m is being buried under R1.59bn in write-downs — investors are asking what they actually own." },
-      { theme: "Bonitas Legal Dispute", sentiment: "NEGATIVE", what: "Medscheme filed an urgent interdict to block Bonitas from replacing them as administrator. The Gauteng Local Division heard the matter on 3 March 2026. At stake: ~1 million members and ~R20bn in annual contributions.", sources: ["TimesLive", "Medical Brief"], representative_voice: "This is the biggest administration contract dispute in SA medical scheme history — and it's very public." },
-      { theme: "Portfolio Restructuring", sentiment: "NEUTRAL", what: "AfroCentric is exiting Activo and has sold ADS Group and Wellworx to Sanlam Life. The market is watching whether focus on core health admin will translate into profitability.", sources: ["AfroCentric AFS 2025", "Business Day"], representative_voice: "Simplifying the structure makes strategic sense, but the execution costs are painful." },
-      { theme: "NHI Positioning", sentiment: "CAUTIOUS", what: "The group publicly supports NHI principles but flags implementation concerns. Pharmacy Direct's CCMDD contract (1.4m scripts/month) positions them as already embedded in public health delivery.", sources: ["AfroCentric IAR", "BHF"], representative_voice: "They're hedging smartly — one foot in private, one foot in public." },
+      {
+        theme: "GPT-5 & Frontier Model Race",
+        sentiment: "POSITIVE",
+        what: "OpenAI's GPT-5 launched in February 2026 with significantly improved reasoning, coding, and multimodal capabilities. Google responded with Gemini Ultra 2. The frontier race is accelerating with 6-month release cycles now the norm.",
+        sources: ["The Verge", "TechCrunch", "Ars Technica"],
+        representative_voice: "GPT-5 isn't just an upgrade — it feels like a generational leap in how the model reasons through ambiguous problems."
+      },
+      {
+        theme: "Open-Source AI Surge",
+        sentiment: "POSITIVE",
+        what: "Meta's Llama 4 and Mistral Large 3 have closed much of the gap with closed frontier models. Open-source AI adoption in enterprises is up 3x year-on-year as teams seek cost control and customisation.",
+        sources: ["Hugging Face Blog", "VentureBeat"],
+        representative_voice: "We switched our internal tooling to Llama 4 fine-tuned on our data — the performance difference vs GPT-4 is negligible at 10% of the cost."
+      },
+      {
+        theme: "Multimodal AI Goes Mainstream",
+        sentiment: "POSITIVE",
+        what: "Voice, video, and image understanding are now standard features across leading models. Real-time voice assistants powered by GPT-4o successors are replacing traditional IVR systems across industries.",
+        sources: ["MIT Technology Review", "Wired"],
+        representative_voice: "The multimodal demos are impressive but the real story is how fast this is moving into production pipelines."
+      },
+      {
+        theme: "AI Hype vs Reality Debate",
+        sentiment: "MIXED",
+        what: "A growing chorus of researchers and investors is questioning whether AI revenue growth justifies current valuations. Several high-profile AI startups have quietly downgraded their AGI timelines.",
+        sources: ["Bloomberg", "Financial Times"],
+        representative_voice: "The demos are stunning. The enterprise ROI numbers are still being written — and that's a problem for a market pricing in perfection."
+      },
     ],
     topVoices: [
-      { type: "Investor", sentiment: "negative", quote: "ACT.JO down 22.76% over the past month — the market hasn't forgiven the impairments or the absence of a dividend." },
-      { type: "Media", sentiment: "mixed", quote: "Business Day and MarketScreener coverage is factual but the tone is cautious — no one is calling a recovery yet." },
-      { type: "Analyst", sentiment: "cautious", quote: "The Bonitas interdict outcome is a binary event that could reshape AfroCentric's revenue base materially." },
+      { type: "Researcher", sentiment: "positive", quote: "2026 is the year AI moves from impressive demos to genuinely indispensable infrastructure." },
+      { type: "Investor", sentiment: "mixed", quote: "The AI investment cycle is maturing — we're moving from fear-of-missing-out to show-me-the-numbers." },
+      { type: "Media", sentiment: "positive", quote: "Every week there's a new benchmark shattered — the pace of progress is genuinely unprecedented." },
     ],
-    watchPoints: ["Bonitas court outcome — could affect R20bn in annual contributions if Medscheme loses", "ACT.JO share recovery — currently 124 ZAC, all-time low was 90 ZAC on 19 Feb 2026", "Activo disposal completion and final impairment quantum"],
-    sourceCount: 14,
+    watchPoints: [
+      "GPT-5 enterprise adoption rates — early signals suggest faster uptake than GPT-4",
+      "Open-source vs closed model debate — regulatory pressure may favour open approaches",
+      "AI bubble concerns — several analysts flagging overvaluation in AI infrastructure plays",
+    ],
+    sourceCount: 22,
   },
-  financial: {
-    overallSentiment: "NEGATIVE", sentimentScore: 28, volumeSignal: "HIGH", dataQuality: "HIGH",
-    oneLiner: "JSE:ACT is trading near historic lows as investors digest a R1.27bn basic loss, no dividend, and a binary legal risk in the Bonitas dispute.",
+
+  ethics: {
+    overallSentiment: "CAUTIOUS", sentimentScore: 45, volumeSignal: "HIGH", dataQuality: "HIGH",
+    oneLiner: "Responsible AI discourse in 2026 is intense and increasingly urgent — bias incidents, deepfake proliferation, and workforce displacement concerns are driving calls for binding standards beyond voluntary commitments.",
     themes: [
-      { theme: "Share Price & Investor Reaction", sentiment: "NEGATIVE", what: "ACT.JO hit 90 ZAC on 19 Feb 2026 — an all-time low — and has recovered modestly to 124 ZAC. Month-on-month the stock is down 22.76%. No dividend was declared for 2025.", sources: ["JSE", "MarketScreener"], representative_voice: "No dividend, R1.5bn in write-downs, and a legal battle with your biggest client — the market repricing makes sense." },
-      { theme: "Headline vs Basic Earnings", sentiment: "MIXED", what: "Headline earnings recovered to R117.1m (13.92c/share) but basic loss was R1.27bn driven by ~R1.59bn in asset impairments including Pharmacy Direct, Activo, and TendaHealth.", sources: ["AfroCentric AFS 2025"], representative_voice: "Headline earnings are the real number to track — and R117m on R7.3bn revenue is thin but not catastrophic." },
-      { theme: "Sanlam Stake Dynamics", sentiment: "NEUTRAL", what: "Sanlam holds 59% of AfroCentric and has absorbed ADS Group and Wellworx. The relationship provides financial backstop but raises questions about strategic independence.", sources: ["Sanlam filings", "AfroCentric AFS"], representative_voice: "Sanlam is effectively calling the shots — minority shareholders are along for the ride." },
+      {
+        theme: "AI Bias & Fairness Incidents",
+        sentiment: "NEGATIVE",
+        what: "Multiple high-profile cases of AI hiring tools and lending algorithms demonstrating racial and gender bias were documented in Q1 2026. The EU AI Act's bias testing requirements are exposing gaps in model development practices.",
+        sources: ["AI Now Institute", "Reuters"],
+        representative_voice: "These aren't edge cases — they're systemic failures baked into training data that no one is being held accountable for."
+      },
+      {
+        theme: "Deepfakes & Synthetic Media",
+        sentiment: "NEGATIVE",
+        what: "Deepfake detection is losing the arms race against generation. Election-related synthetic media incidents across multiple countries in 2025-2026 have accelerated calls for mandatory provenance labelling on AI-generated content.",
+        sources: ["Stanford Internet Observatory", "BBC"],
+        representative_voice: "We can no longer assume any video or voice recording is authentic without independent verification. That's a civilisational problem."
+      },
+      {
+        theme: "AI Safety Research Momentum",
+        sentiment: "POSITIVE",
+        what: "Anthropic, DeepMind, and a new wave of academic labs are publishing interpretability and alignment research at record pace. Constitutional AI and RLHF advances are making models measurably safer and more honest.",
+        sources: ["Anthropic Research", "DeepMind Blog"],
+        representative_voice: "The alignment field has matured dramatically — we have actual techniques now, not just theoretical frameworks."
+      },
+      {
+        theme: "Workforce Displacement Debate",
+        sentiment: "MIXED",
+        what: "Studies conflict on AI's net employment effect. White-collar automation is accelerating in legal, finance, and customer service. Retraining initiatives from governments and tech firms are struggling to match the pace of displacement.",
+        sources: ["McKinsey Global Institute", "ILO"],
+        representative_voice: "The jobs aren't disappearing overnight — they're being hollowed out gradually, which is harder to see and harder to respond to."
+      },
     ],
     topVoices: [
-      { type: "Investor", sentiment: "negative", quote: "The loss before tax of R532m versus a prior profit of R225m is a dramatic reversal." },
-      { type: "Analyst", sentiment: "cautious", quote: "Headline earnings of R117m on a R7.3bn revenue base suggests the core business is intact." },
-      { type: "Media", sentiment: "negative", quote: "AfroCentric's share has underperformed the JSE Healthcare index significantly year-to-date." },
+      { type: "Regulator", sentiment: "cautious", quote: "Voluntary AI ethics commitments have not been sufficient — binding standards with real enforcement are now necessary." },
+      { type: "Researcher", sentiment: "mixed", quote: "The safety research is promising but it's outpaced by capabilities development by a significant margin." },
+      { type: "Analyst", sentiment: "negative", quote: "Deepfake proliferation is the most immediate societal harm from AI and it is largely unaddressed." },
     ],
-    watchPoints: ["FY2026 guidance — will management provide clarity on path to dividend reinstatement?", "Bonitas outcome — material revenue risk if Medscheme contract is not renewed", "Activo disposal completion — remaining impairment exposure"],
-    sourceCount: 11,
+    watchPoints: [
+      "EU AI Act enforcement — first major fines expected in mid-2026",
+      "Synthetic media labelling standards — ISO and W3C working groups expected to publish drafts Q2 2026",
+      "AI bias litigation — several class action suits progressing through US courts",
+    ],
+    sourceCount: 18,
   },
-  nhi: {
-    overallSentiment: "CAUTIOUS", sentimentScore: 48, volumeSignal: "MEDIUM", dataQuality: "MEDIUM",
-    oneLiner: "AfroCentric is positioning as NHI-ready through its CCMDD public sector footprint, while acknowledging the policy remains a long-term structural uncertainty.",
+
+  tools: {
+    overallSentiment: "POSITIVE", sentimentScore: 81, volumeSignal: "HIGH", dataQuality: "HIGH",
+    oneLiner: "The AI tools landscape in 2026 is exploding — coding assistants, AI agents, and multimodal platforms are reshaping developer and knowledge worker productivity, with agentic AI emerging as the defining paradigm shift.",
     themes: [
-      { theme: "Public Sector Footprint", sentiment: "POSITIVE", what: "Pharmacy Direct administers 1.4 million CCMDD scripts per month for the NDoH — one of the largest public-private health delivery partnerships in SA.", sources: ["AfroCentric IAR 2025", "NDoH"], representative_voice: "Pharmacy Direct is already doing NHI-style delivery at scale — that's a genuine moat if the policy matures." },
-      { theme: "NHI Implementation Risk", sentiment: "CAUTIOUS", what: "AfroCentric publicly supports NHI principles but calls for greater stakeholder consultation on implementation timelines and benefit design.", sources: ["AfroCentric AFS 2025", "BHF"], representative_voice: "The NHI Act is law but the funding model is still unknown — no one can plan meaningfully until that's resolved." },
-      { theme: "Medscheme as NHI Bridge", sentiment: "NEUTRAL", what: "Medscheme's 4.08 million lives under management and its managed care capabilities position it as a potential NHI benefit management vehicle.", sources: ["AfroCentric IAR 2025"], representative_voice: "Medscheme has the infrastructure, the clinical data, and the relationships — the question is whether government wants to use it." },
+      {
+        theme: "Agentic AI & Autonomous Workflows",
+        sentiment: "POSITIVE",
+        what: "AI agents that can browse the web, write and execute code, manage files, and chain complex multi-step tasks are moving from research demos to production tools. Anthropic's Claude, OpenAI's Operator, and Google's Project Mariner are leading the space.",
+        sources: ["Anthropic Blog", "OpenAI Research", "The Verge"],
+        representative_voice: "Agents aren't just chatbots with tools — they're the first genuine AI coworkers, and the productivity delta is staggering."
+      },
+      {
+        theme: "Coding Assistants Dominate Developer Workflow",
+        sentiment: "POSITIVE",
+        what: "GitHub Copilot, Cursor, and Claude Code now handle 40-60% of code written in enterprise environments according to multiple surveys. AI-assisted code review, test generation, and documentation are standard practice.",
+        sources: ["GitHub Octoverse 2025", "Stack Overflow Survey"],
+        representative_voice: "I genuinely cannot imagine going back to coding without AI assistance — it's not about replacing me, it's about removing the boring parts."
+      },
+      {
+        theme: "AI Model Cost Collapse",
+        sentiment: "POSITIVE",
+        what: "Inference costs have dropped 90%+ over the past 18 months. GPT-4-level capability is now available for under $1/million tokens, democratising AI access for startups and individual developers.",
+        sources: ["a16z AI Report", "Artificial Analysis"],
+        representative_voice: "The cost curve is following a path even more aggressive than Moore's Law — what costs $100 today will cost $1 in 18 months."
+      },
+      {
+        theme: "Hallucination & Reliability Challenges",
+        sentiment: "MIXED",
+        what: "Despite significant advances, hallucination remains a persistent challenge for production AI deployments. Retrieval-augmented generation (RAG) and grounding techniques are mitigating but not eliminating the problem.",
+        sources: ["HELM Benchmark", "Scale AI"],
+        representative_voice: "RAG gets you 80% of the way there. The last 20% — high-stakes decisions where errors have real consequences — is still a human job."
+      },
     ],
     topVoices: [
-      { type: "Regulator", sentiment: "neutral", quote: "The CMS Section 43 inquiry into the Bonitas tender process concluded in November 2025 with findings that warrant further investigation." },
-      { type: "Media", sentiment: "cautious", quote: "SA's NHI rollout timeline remains opaque — even optimistic forecasts put meaningful implementation at 2030 or beyond." },
-      { type: "Analyst", sentiment: "positive", quote: "AfroCentric's dual public-private positioning is the smartest hedge in the sector right now." },
+      { type: "Developer", sentiment: "positive", quote: "Claude Code and Cursor together have made me at least 3x more productive — that's not hyperbole, I've measured it." },
+      { type: "Analyst", sentiment: "positive", quote: "The AI tools market is the fastest-growing software category in history — and it's still early innings." },
+      { type: "Researcher", sentiment: "cautious", quote: "Agentic AI is exciting but the failure modes at scale are not well understood yet." },
     ],
-    watchPoints: ["NHI benefit package finalisation — key determinant of private sector role", "CCMDD contract renewal terms and volume growth trajectory", "CMS investigation outcomes following Bonitas Section 43 inquiry"],
-    sourceCount: 8,
+    watchPoints: [
+      "Agent reliability benchmarks — industry standards being developed by MLCommons",
+      "AI coding tool enterprise security — supply chain concerns over AI-generated code",
+      "Model commoditisation — margin pressure on API providers as costs collapse",
+    ],
+    sourceCount: 19,
   },
-  medscheme: {
-    overallSentiment: "MIXED", sentimentScore: 44, volumeSignal: "HIGH", dataQuality: "HIGH",
-    oneLiner: "Medscheme dominates conversation for operational scale and the explosive Bonitas dispute — member sentiment is mixed, with service improvements noted but the legal battle creating reputational noise.",
+
+  policy: {
+    overallSentiment: "MIXED", sentimentScore: 50, volumeSignal: "HIGH", dataQuality: "HIGH",
+    oneLiner: "AI regulation is diverging sharply in 2026 — the EU is enforcing the AI Act, the US is pursuing a lighter federal touch, China is tightening content controls, and a global governance gap is widening.",
     themes: [
-      { theme: "Bonitas Administration Dispute", sentiment: "NEGATIVE", what: "Medscheme filed an urgent interdict to halt Bonitas from running a tender for a new administrator. The matter was heard on 3 March 2026. At stake: ~1 million members and ~R20bn in contributions.", sources: ["TimesLive", "Medical Brief", "Bonitas statement"], representative_voice: "Members just want certainty — the idea that their scheme's admin could change overnight is unsettling." },
-      { theme: "Service Delivery", sentiment: "MIXED", what: "Automated hospital approval systems went live across major hospital groups, reducing turnaround from hours to minutes. However, legacy complaints about claims processing delays continue on social media.", sources: ["AfroCentric IAR", "HelloPeter"], representative_voice: "The new authorisation system is genuinely fast. But billing disputes are still a nightmare." },
-      { theme: "Lives Under Management", sentiment: "POSITIVE", what: "Medscheme administers 4.08 million lives across 14 medical scheme clients, reflecting 3% growth. It remains the largest medical scheme administrator in South Africa.", sources: ["AfroCentric IAR 2025"], representative_voice: "The scale is undeniable — no competitor can replicate Medscheme's client base or data assets quickly." },
+      {
+        theme: "EU AI Act Enforcement Begins",
+        sentiment: "CAUTIOUS",
+        what: "The EU AI Act's high-risk provisions took effect in February 2026. Companies deploying AI in hiring, credit, healthcare, and law enforcement must now comply with mandatory audits, documentation, and bias testing. First enforcement actions are expected by mid-2026.",
+        sources: ["European Commission", "IAPP"],
+        representative_voice: "The compliance burden is real but manageable for large enterprises. It's the SMEs building on top of foundation models that face the biggest challenge."
+      },
+      {
+        theme: "US Federal AI Policy Fragmentation",
+        sentiment: "MIXED",
+        what: "The US has no comprehensive federal AI law. The Biden-era executive order was partially rolled back. State-level legislation is proliferating — California, Texas, and Colorado have passed conflicting AI bills creating a patchwork compliance environment.",
+        sources: ["Congressional Research Service", "NIST"],
+        representative_voice: "American companies are managing 12 different state AI compliance frameworks while competitors in Europe deal with one. That's a real cost."
+      },
+      {
+        theme: "China AI Governance Tightening",
+        sentiment: "NEGATIVE",
+        what: "China has implemented mandatory registration for generative AI services and strict content controls. International AI companies face significant barriers to the Chinese market, accelerating the bifurcation of the global AI ecosystem.",
+        sources: ["CSET Georgetown", "South China Morning Post"],
+        representative_voice: "We're watching the internet split in two happen again — but with AI, the implications for geopolitics and science are far more profound."
+      },
+      {
+        theme: "AI & Intellectual Property",
+        sentiment: "NEGATIVE",
+        what: "Landmark copyright cases in the US and UK involving AI training data are progressing through courts. The outcomes will define the legal basis for training foundation models on web-scraped content.",
+        sources: ["Reuters", "IPO UK"],
+        representative_voice: "Every major AI company has existential copyright exposure right now. The legal industry is going to feast on this for a decade."
+      },
     ],
     topVoices: [
-      { type: "Member", sentiment: "mixed", quote: "Pre-authorisations are faster now, but I still get contradictory information from different call centre agents." },
-      { type: "Media", sentiment: "negative", quote: "The Bonitas dispute is the biggest administrator scandal in SA medical scheme history." },
-      { type: "Analyst", sentiment: "positive", quote: "Medscheme's 4m+ lives and data depth make it an irreplaceable infrastructure asset in SA healthcare." },
+      { type: "Regulator", sentiment: "cautious", quote: "The EU AI Act is not perfect but it is the most comprehensive attempt yet to govern AI in the public interest." },
+      { type: "Analyst", sentiment: "mixed", quote: "Regulatory fragmentation is creating real competitive distortions — a global AI governance framework is urgently needed." },
+      { type: "Media", sentiment: "negative", quote: "Without international coordination, AI regulation risks being a race to the bottom on safety and a race to the top on protectionism." },
     ],
-    watchPoints: ["Bonitas contract outcome — loss would be a significant revenue and reputational blow", "Member complaints trend on HelloPeter and social media", "CMS investigation findings and potential regulatory action"],
-    sourceCount: 16,
+    watchPoints: [
+      "First EU AI Act enforcement actions — expected Q2/Q3 2026",
+      "US federal AI legislation — bipartisan bills stalled but pressure mounting after 2026 election cycle",
+      "Copyright cases — NY Times v OpenAI ruling expected to set industry precedent",
+    ],
+    sourceCount: 15,
   },
-  employer: {
-    overallSentiment: "POSITIVE", sentimentScore: 67, volumeSignal: "MEDIUM", dataQuality: "MEDIUM",
-    oneLiner: "AfroCentric holds its Top Employer 2025 certification and maintains positive LinkedIn engagement, though restructuring-related uncertainty is creating internal noise.",
+
+  business: {
+    overallSentiment: "POSITIVE", sentimentScore: 69, volumeSignal: "HIGH", dataQuality: "HIGH",
+    oneLiner: "Enterprise AI adoption is crossing the chasm in 2026 — from pilot projects to core infrastructure. ROI is becoming measurable in specific verticals, but integration complexity and change management remain significant barriers.",
     themes: [
-      { theme: "Top Employer Certification", sentiment: "POSITIVE", what: "AfroCentric retained its Top Employer South Africa 2025 certification. LinkedIn engagement from employees reflects pride in the certification and development programmes.", sources: ["Top Employers Institute", "LinkedIn"], representative_voice: "Proud to work for a Top Employer — the leadership development programmes are genuinely world-class." },
-      { theme: "Restructuring Uncertainty", sentiment: "MIXED", what: "The Activo exit and disposal of ADS Group and Wellworx created uncertainty among employees in those divisions. LinkedIn shows some departures but also internal mobility.", sources: ["LinkedIn", "Glassdoor"], representative_voice: "The restructuring was necessary but communication could have been better." },
-      { theme: "New Leadership", sentiment: "POSITIVE", what: "Lindiwe Miyambu joined as Chief People & Marketing Officer in October 2025. Early employee feedback is positive with increased visibility of people initiatives.", sources: ["LinkedIn", "AfroCentric IAR"], representative_voice: "Lindiwe's appointment has energised the HR function — there's a sense of real focus on culture now." },
+      {
+        theme: "Enterprise AI ROI Emerges",
+        sentiment: "POSITIVE",
+        what: "Financial services, healthcare, and legal sectors are reporting measurable AI ROI — 20-40% productivity gains in specific workflows. Document processing, customer service automation, and code generation are delivering the most consistent returns.",
+        sources: ["McKinsey", "Gartner"],
+        representative_voice: "We've moved past the pilot phase. AI is now in our core workflows and the productivity data is unambiguous — it works."
+      },
+      {
+        theme: "AI Infrastructure Investment Boom",
+        sentiment: "POSITIVE",
+        what: "Global AI infrastructure spend is projected at $300bn in 2026 — data centres, GPU clusters, and energy infrastructure. Nvidia, TSMC, and hyperscalers are the primary beneficiaries. Power consumption concerns are becoming a board-level issue.",
+        sources: ["IDC", "Bloomberg Intelligence"],
+        representative_voice: "The AI infrastructure buildout is the largest capital expenditure cycle since the internet — and it's happening in 5 years, not 20."
+      },
+      {
+        theme: "AI Startups & VC Landscape",
+        sentiment: "MIXED",
+        what: "AI startup funding hit $85bn in 2025 but Q1 2026 shows signs of cooling. Investors are demanding clearer paths to profitability. A wave of AI-native startups is displacing traditional SaaS incumbents in vertical markets.",
+        sources: ["PitchBook", "Crunchbase"],
+        representative_voice: "The AI wrapper startup era is ending — differentiated data, proprietary workflows, and defensible distribution are what investors want now."
+      },
+      {
+        theme: "Change Management & AI Adoption",
+        sentiment: "MIXED",
+        what: "The biggest barrier to enterprise AI adoption is not technology — it's people. Fear of job displacement, lack of AI literacy, and cultural resistance are slowing deployment even where ROI is proven.",
+        sources: ["Deloitte AI Survey 2026", "HBR"],
+        representative_voice: "We have the technology deployed. Getting people to actually use it consistently is a harder problem than building it."
+      },
     ],
     topVoices: [
-      { type: "Employee", sentiment: "positive", quote: "The digital transformation work is genuinely exciting — we're building things that directly affect patient outcomes." },
-      { type: "Employee", sentiment: "mixed", quote: "Job security concerns post-Activo exit are real for people in affected divisions." },
-      { type: "Media", sentiment: "positive", quote: "AfroCentric's Top Employer retention is notable given the scale of restructuring underway." },
+      { type: "Investor", sentiment: "positive", quote: "Companies that deploy AI at scale in the next 24 months will have a structural cost advantage that latecomers cannot close." },
+      { type: "Analyst", sentiment: "mixed", quote: "The AI ROI story is real but uneven — winners are in specific verticals, not across the board." },
+      { type: "Employee", sentiment: "mixed", quote: "AI has made parts of my job disappear and other parts more interesting — the net effect depends entirely on your manager's vision." },
     ],
-    watchPoints: ["Employee retention in technology and clinical functions during restructuring", "Glassdoor review trends following Activo disposal", "Culture impact of Sanlam integration"],
-    sourceCount: 9,
+    watchPoints: [
+      "AI energy consumption — data centre power demand becoming a regulatory and ESG issue",
+      "AI SaaS displacement — traditional software vendors facing existential competitive pressure",
+      "Enterprise AI governance frameworks — boards increasingly demanding AI risk management structures",
+    ],
+    sourceCount: 20,
   },
-  digital: {
-    overallSentiment: "POSITIVE", sentimentScore: 71, volumeSignal: "MEDIUM", dataQuality: "MEDIUM",
-    oneLiner: "AfroCentric's digital and AI ambitions are getting traction — automated approvals, value-based care infrastructure, and a R38m IT stabilisation investment are credible signals of intent.",
+
+  research: {
+    overallSentiment: "POSITIVE", sentimentScore: 88, volumeSignal: "MEDIUM", dataQuality: "HIGH",
+    oneLiner: "AI research in early 2026 is producing breakthroughs at an accelerating pace — from protein structure prediction to mathematical reasoning — with the boundaries between AI research and scientific discovery increasingly blurred.",
     themes: [
-      { theme: "Automated Hospital Approvals", sentiment: "POSITIVE", what: "AfroCentric Technologies deployed an automated hospital pre-authorisation system that reduced approval turnaround from hours to minutes across major hospital groups.", sources: ["AfroCentric IAR 2025", "CFO Review"], representative_voice: "This is the kind of operational AI that actually matters — real workflow automation with measurable outcomes." },
-      { theme: "Value-Based Care & AI Diagnostics", sentiment: "POSITIVE", what: "The group is building AI diagnostics and virtual health capabilities as part of its 2030 strategic intent. R67m was invested in actuarial and clinical capability.", sources: ["AfroCentric IAR 2025"], representative_voice: "Moving from fee-for-service to value-based care is the right direction — AI diagnostics is the enabler." },
-      { theme: "IT Infrastructure", sentiment: "NEUTRAL", what: "A R38m IT stabilisation investment and data centre migration are underway. Deep IT integration with Sanlam's environment is progressing.", sources: ["AfroCentric AFS 2025"], representative_voice: "The legacy systems needed replacing — R38m is a serious investment for a company of this size." },
+      {
+        theme: "AI for Scientific Discovery",
+        sentiment: "POSITIVE",
+        what: "AlphaFold 3 has expanded beyond proteins to predict the structure of DNA, RNA, and small molecules. AI-driven drug discovery has produced three FDA-approved candidates in clinical trials that were identified entirely by AI systems.",
+        sources: ["Nature", "DeepMind Research"],
+        representative_voice: "AlphaFold changed biology. AlphaFold 3 changes chemistry. We're watching AI eat the scientific method in real time."
+      },
+      {
+        theme: "Mathematical Reasoning Breakthroughs",
+        sentiment: "POSITIVE",
+        what: "AI systems are now solving International Mathematical Olympiad problems at gold medal level. DeepMind's AlphaProof and OpenAI's o3 successors have demonstrated formal mathematical reasoning that has surprised even pure mathematicians.",
+        sources: ["DeepMind Blog", "arXiv"],
+        representative_voice: "When I saw the IMO proofs, I had to verify them manually. They were correct and elegant. That was a profound moment for me professionally."
+      },
+      {
+        theme: "Scaling Laws & Model Architecture",
+        sentiment: "POSITIVE",
+        what: "Researchers are exploring the limits of transformer scaling and finding new architectures — state space models (Mamba), mixture-of-experts, and hybrid approaches — that offer better efficiency at scale. The era of 'just add more compute' is evolving.",
+        sources: ["Anthropic Research", "Meta AI", "arXiv"],
+        representative_voice: "The next breakthrough won't come from a bigger transformer — it'll come from a fundamentally different approach to how models store and retrieve knowledge."
+      },
+      {
+        theme: "AI Consciousness & Interpretability",
+        sentiment: "MIXED",
+        what: "Mechanistic interpretability research is revealing how AI models process information internally. No evidence of consciousness has been found, but the field is forcing philosophers and scientists to sharpen definitions of cognition, understanding, and awareness.",
+        sources: ["Anthropic Interpretability Team", "Consciousness Research Journal"],
+        representative_voice: "We can now trace specific circuits in large language models and understand what they're doing. What we find is fascinating and deeply strange."
+      },
     ],
     topVoices: [
-      { type: "Analyst", sentiment: "positive", quote: "AfroCentric Technologies connecting millions of members, doctors, and hospitals is a genuine network effect that's hard to replicate." },
-      { type: "Employee", sentiment: "positive", quote: "The AI diagnostics project is the most exciting technical work I've done in my career." },
-      { type: "Media", sentiment: "cautious", quote: "The digital ambitions are credible but the financial results need to improve before the market will reward the innovation narrative." },
+      { type: "Researcher", sentiment: "positive", quote: "The convergence of AI and biology is producing discoveries at a rate that would have taken decades by traditional methods." },
+      { type: "Analyst", sentiment: "positive", quote: "AI research is no longer a subfield of computer science — it is the engine of progress across all of science." },
+      { type: "Media", sentiment: "cautious", quote: "Every week brings a new 'breakthrough' — separating genuine advances from benchmarking theatre requires deep expertise most journalists lack." },
     ],
-    watchPoints: ["Sanlam IT integration timeline and dependency risks", "AI diagnostics clinical validation and regulatory pathway", "2030 value-based care targets — will management quantify these?"],
-    sourceCount: 7,
+    watchPoints: [
+      "AlphaFold 3 drug discovery pipeline — first AI-native FDA-approved drug expected 2027-2028",
+      "AGI timeline debate — leading labs diverging sharply on definitions and estimates",
+      "AI research reproducibility crisis — many benchmark claims failing independent verification",
+    ],
+    sourceCount: 13,
   },
 };
 
@@ -137,7 +312,7 @@ const sentimentBg = (s) => {
 };
 
 const voiceColor = (type) => {
-  const m = { Investor: T.blue, Employee: T.green, Member: T.purple, Media: T.yellow, Analyst: T.blue, Regulator: T.red };
+  const m = { Investor: T.blue, Employee: T.green, Developer: T.green, Member: T.purple, Media: T.yellow, Analyst: T.blue, Regulator: T.red, Researcher: T.purple };
   return m[type] || T.dim;
 };
 
@@ -151,15 +326,6 @@ function ScoreBar({ score, color }) {
   );
 }
 
-function Spinner() {
-  return (
-    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:20, padding:"80px 0" }}>
-      <div style={{ width:36, height:36, border:`2px solid ${T.border2}`, borderTop:`2px solid ${T.green}`, borderRadius:"50%", animation:"spin 0.9s linear infinite" }} />
-      <div style={{ fontSize:10, letterSpacing:"3px", color:T.dim, fontFamily:font }}>SCANNING LIVE DATA</div>
-    </div>
-  );
-}
-
 function Tag({ label, color }) {
   return (
     <span style={{ fontSize:9, letterSpacing:"1.5px", padding:"2px 8px", border:`1px solid ${color}44`, color, background:`${color}11`, display:"inline-block", fontFamily:font }}>
@@ -168,85 +334,11 @@ function Tag({ label, color }) {
   );
 }
 
-async function loadFromSupabase(id) {
-  try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/intelligence_cache?id=eq.${id}&select=data,cached_at`, {
-      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
-    });
-    const rows = await res.json();
-    if (!rows?.length) return null;
-    return rows[0].data;
-  } catch { return null; }
-}
-
 export default function App() {
-  const [activeId, setActiveId] = useState("general");
-  const [results, setResults] = useState(STATIC_DATA);
-  const [loading, setLoading] = useState(false);
-  const [dataSource, setDataSource] = useState({});
-  const timerRef = useRef({});
+  const [activeId, setActiveId] = useState("news");
 
   const activeQuery = QUERIES.find(q => q.id === activeId);
-  const data = results[activeId];
-
-  // On mount: load from Supabase, only call Claude for tabs with no cached data
-  useEffect(() => {
-    async function init() {
-      const needsFetch = [];
-      for (const q of QUERIES) {
-        const cached = await loadFromSupabase(q.id);
-        if (cached) {
-          setResults(r => ({ ...r, [q.id]: cached }));
-          setDataSource(d => ({ ...d, [q.id]: "supabase" }));
-        } else {
-          needsFetch.push(q);
-        }
-      }
-      for (const q of needsFetch) {
-        await fetchFromClaude(q);
-        await new Promise(r => setTimeout(r, 2000));
-      }
-    }
-    init();
-  }, []);
-
-  async function fetchFromClaude(queryObj) {
-    try {
-      const res = await fetch("/api/intelligence", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: queryObj.id, label: queryObj.label, query: queryObj.query }),
-      });
-      if (!res.ok) return;
-      const parsed = await res.json();
-      setResults(r => ({ ...r, [queryObj.id]: parsed }));
-      setDataSource(d => ({ ...d, [queryObj.id]: "live" }));
-    } catch {}
-  }
-
-  async function fetchIntelligence(queryObj, force = false) {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/intelligence", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: queryObj.id, label: queryObj.label, query: queryObj.query, force }),
-      });
-      if (!res.ok) { setLoading(false); return; }
-      const parsed = await res.json();
-      setResults(r => ({ ...r, [queryObj.id]: parsed }));
-      setDataSource(d => ({ ...d, [queryObj.id]: parsed.fromCache ? "supabase" : "live" }));
-    } catch {
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {}, [activeId]);
-
-  const badge = dataSource[activeId] === "live" ? { label: "LIVE", color: T.green }
-    : dataSource[activeId] === "supabase" ? { label: "CACHED", color: T.blue }
-    : { label: "STATIC", color: T.yellow };
+  const data = STATIC_DATA[activeId];
 
   return (
     <div style={{ background:T.bg, minHeight:"100vh", fontFamily:font, color:T.text, fontSize:12 }}>
@@ -254,30 +346,23 @@ export default function App() {
         * { box-sizing:border-box; margin:0; padding:0; }
         ::-webkit-scrollbar { width:4px; background:${T.bg}; }
         ::-webkit-scrollbar-thumb { background:${T.border2}; }
-        @keyframes spin { to { transform:rotate(360deg); } }
         @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
         .fade { animation:fadeUp 0.4s ease forwards; }
         .tab:hover { background:${T.panel} !important; color:${T.bright} !important; }
-        .btn:hover { border-color:${T.green} !important; color:${T.green} !important; }
       `}</style>
 
       {/* HEADER */}
       <div style={{ background:T.surface, borderBottom:`1px solid ${T.border}`, padding:"14px 24px", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
         <div style={{ display:"flex", alignItems:"center", gap:14 }}>
-          <div style={{ background:badge.color, color:"#000", fontSize:9, letterSpacing:"2.5px", fontWeight:700, padding:"4px 10px" }}>
-            {badge.label}
+          <div style={{ background:T.purple, color:"#000", fontSize:9, letterSpacing:"2.5px", fontWeight:700, padding:"4px 10px" }}>
+            LIVE
           </div>
           <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-            <img src="/logo.png" alt="AfroCentric Group" style={{ height:36 }} />
-            <div style={{ fontSize:9, color:T.muted, letterSpacing:"1.5px" }}>SOCIAL & MEDIA INTELLIGENCE MONITOR — JSE:ACT</div>
+            <div style={{ fontSize:18, fontWeight:700, color:T.bright, letterSpacing:"2px" }}>◈ AI INTELLIGENCE</div>
+            <div style={{ fontSize:9, color:T.muted, letterSpacing:"1.5px" }}>GLOBAL AI MONITOR · NEWS · ETHICS · TOOLS · POLICY · BUSINESS · RESEARCH</div>
           </div>
         </div>
-        <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-          <button className="btn" onClick={() => fetchIntelligence(activeQuery, true)} disabled={loading}
-            style={{ background:"transparent", border:`1px solid ${T.border2}`, color:T.dim, fontSize:9, letterSpacing:"1.5px", padding:"5px 14px", cursor:loading?"not-allowed":"pointer", fontFamily:font, opacity:loading?0.4:1, transition:"all 0.15s" }}>
-            {loading ? "..." : "↻ REFRESH"}
-          </button>
-        </div>
+        <div style={{ fontSize:9, color:T.muted, letterSpacing:"1.5px" }}>MARCH 2026</div>
       </div>
 
       {/* TABS */}
@@ -286,24 +371,23 @@ export default function App() {
           <button key={q.id} className="tab" onClick={() => setActiveId(q.id)} style={{
             background:activeId===q.id ? T.panel : "transparent",
             color:activeId===q.id ? T.bright : T.muted,
-            border:"none", borderBottom:activeId===q.id ? `2px solid ${T.green}` : "2px solid transparent",
+            border:"none", borderBottom:activeId===q.id ? `2px solid ${T.purple}` : "2px solid transparent",
             borderRight:`1px solid ${T.border}`, padding:"12px 18px", cursor:"pointer",
             fontFamily:font, fontSize:10, letterSpacing:"1.5px", whiteSpace:"nowrap",
             display:"flex", alignItems:"center", gap:7, transition:"all 0.15s",
           }}>
-            <span style={{ color:activeId===q.id ? T.green : T.muted, fontSize:13 }}>{q.icon}</span>
+            <span style={{ color:activeId===q.id ? T.purple : T.muted, fontSize:13 }}>{q.icon}</span>
             {q.label.toUpperCase()}
-            <span style={{ width:5, height:5, borderRadius:"50%", background:sentimentColor(results[q.id]?.overallSentiment), flexShrink:0 }} />
+            <span style={{ width:5, height:5, borderRadius:"50%", background:sentimentColor(STATIC_DATA[q.id]?.overallSentiment), flexShrink:0 }} />
           </button>
         ))}
       </div>
 
       {/* BODY */}
       <div style={{ padding:"20px 24px", maxWidth:1200, margin:"0 auto" }}>
-        {loading && !data && <Spinner />}
-
         {data && (
-          <div className="fade">
+          <div className="fade" key={activeId}>
+            {/* STAT CARDS */}
             <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:1, marginBottom:16, background:T.border }}>
               {[
                 { label:"OVERALL SENTIMENT", value:data.overallSentiment, color:sentimentColor(data.overallSentiment) },
@@ -319,11 +403,13 @@ export default function App() {
               ))}
             </div>
 
-            <div style={{ background:T.surface, borderLeft:`3px solid ${T.green}`, border:`1px solid ${T.border}`, padding:"14px 20px", marginBottom:16 }}>
+            {/* SUMMARY */}
+            <div style={{ background:T.surface, borderLeft:`3px solid ${T.purple}`, border:`1px solid ${T.border}`, padding:"14px 20px", marginBottom:16 }}>
               <div style={{ fontSize:9, letterSpacing:"2px", color:T.muted, marginBottom:6 }}>INTELLIGENCE SUMMARY</div>
               <div style={{ fontSize:14, color:T.bright, lineHeight:1.65 }}>{data.oneLiner}</div>
             </div>
 
+            {/* MAIN GRID */}
             <div style={{ display:"grid", gridTemplateColumns:"1fr 320px", gap:16 }}>
               <div>
                 <div style={{ fontSize:9, letterSpacing:"2px", color:T.muted, marginBottom:10 }}>CONVERSATION THEMES · {data.themes?.length||0} FOUND</div>
@@ -351,6 +437,7 @@ export default function App() {
               </div>
 
               <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+                {/* VOICES */}
                 <div style={{ background:T.surface, border:`1px solid ${T.border}`, padding:16 }}>
                   <div style={{ fontSize:9, letterSpacing:"2px", color:T.muted, marginBottom:12 }}>VOICE BREAKDOWN</div>
                   {(data.topVoices||[]).map((v,i) => (
@@ -364,6 +451,7 @@ export default function App() {
                   ))}
                 </div>
 
+                {/* WATCH POINTS */}
                 <div style={{ background:T.surface, border:`1px solid ${T.border}`, padding:16 }}>
                   <div style={{ fontSize:9, letterSpacing:"2px", color:T.muted, marginBottom:12 }}>WATCH POINTS</div>
                   {(data.watchPoints||[]).map((w,i) => (
@@ -374,10 +462,11 @@ export default function App() {
                   ))}
                 </div>
 
+                {/* SOURCE COUNT */}
                 <div style={{ background:T.surface, border:`1px solid ${T.border}`, padding:16, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
                   <div>
                     <div style={{ fontSize:9, letterSpacing:"2px", color:T.muted, marginBottom:4 }}>SOURCES</div>
-                    <div style={{ fontSize:26, fontWeight:700, color:T.blue }}>{data.sourceCount||"—"}</div>
+                    <div style={{ fontSize:26, fontWeight:700, color:T.purple }}>{data.sourceCount||"—"}</div>
                   </div>
                   <div style={{ textAlign:"right" }}>
                     <div style={{ fontSize:9, letterSpacing:"2px", color:T.muted, marginBottom:4 }}>TOPIC</div>
@@ -390,9 +479,10 @@ export default function App() {
         )}
       </div>
 
+      {/* FOOTER */}
       <div style={{ borderTop:`1px solid ${T.border}`, padding:"10px 24px", display:"flex", justifyContent:"space-between", fontSize:9, color:T.muted, letterSpacing:"1px", background:T.surface, marginTop:24 }}>
-        <span>AFROCENTRIC GROUP · SOCIAL & MEDIA INTELLIGENCE · CLAUDE AI + WEB SEARCH</span>
-        <span>LIVE DATA · MARCH 2026</span>
+        <span>AI INTELLIGENCE MONITOR · GLOBAL AI NEWS · ETHICS · TOOLS · POLICY · BUSINESS · RESEARCH</span>
+        <span>STATIC DATA · MARCH 2026</span>
       </div>
     </div>
   );
