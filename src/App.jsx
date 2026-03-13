@@ -358,6 +358,7 @@ export default function App() {
             LIVE
           </div>
           <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+            <img src="/Algoviva White logo.png" alt="Algoviva" style={{ height:36 }} />
             <div style={{ fontSize:18, fontWeight:700, color:T.bright, letterSpacing:"2px" }}>◈ AI INTELLIGENCE</div>
             <div style={{ fontSize:9, color:T.muted, letterSpacing:"1.5px" }}>GLOBAL AI MONITOR · NEWS · ETHICS · TOOLS · POLICY · BUSINESS · RESEARCH</div>
           </div>
