@@ -349,21 +349,35 @@ export default function App() {
         @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
         .fade { animation:fadeUp 0.4s ease forwards; }
         .tab:hover { background:${T.panel} !important; color:${T.bright} !important; }
+        .stat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; }
+        .main-grid { display:grid; grid-template-columns:1fr 320px; gap:16px; }
+        .header-subtitle { display:block; }
+        .header-title { font-size:18px; }
+        @media (max-width: 768px) {
+          .stat-grid { grid-template-columns:repeat(2,1fr) !important; }
+          .main-grid { grid-template-columns:1fr !important; }
+          .header-subtitle { display:none !important; }
+          .header-title { font-size:14px !important; }
+          .header-inner { gap:8px !important; }
+        }
+        @media (max-width: 480px) {
+          .stat-grid { grid-template-columns:1fr 1fr !important; }
+        }
       `}</style>
 
       {/* HEADER */}
-      <div style={{ background:T.surface, borderBottom:`1px solid ${T.border}`, padding:"14px 24px", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-        <div style={{ display:"flex", alignItems:"center", gap:14 }}>
-          <div style={{ background:T.purple, color:"#000", fontSize:9, letterSpacing:"2.5px", fontWeight:700, padding:"4px 10px" }}>
+      <div style={{ background:T.surface, borderBottom:`1px solid ${T.border}`, padding:"12px 16px", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:10 }} className="header-inner">
+          <div style={{ background:T.purple, color:"#000", fontSize:9, letterSpacing:"2.5px", fontWeight:700, padding:"4px 10px", flexShrink:0 }}>
             LIVE
           </div>
-          <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-            <img src="/Algoviva White logo.png" alt="Algoviva" style={{ height:36 }} />
-            <div style={{ fontSize:18, fontWeight:700, color:T.bright, letterSpacing:"2px" }}>◈ AI INTELLIGENCE</div>
-            <div style={{ fontSize:9, color:T.muted, letterSpacing:"1.5px" }}>GLOBAL AI MONITOR · NEWS · ETHICS · TOOLS · POLICY · BUSINESS · RESEARCH</div>
+          <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+            <img src="/Algoviva White logo.png" alt="Algoviva" style={{ height:28 }} />
+            <div className="header-title" style={{ fontWeight:700, color:T.bright, letterSpacing:"2px", fontFamily:font }}>◈ AI INTELLIGENCE</div>
+            <div className="header-subtitle" style={{ fontSize:9, color:T.muted, letterSpacing:"1.5px" }}>GLOBAL AI MONITOR · NEWS · ETHICS · TOOLS · POLICY · BUSINESS · RESEARCH</div>
           </div>
         </div>
-        <div style={{ fontSize:9, color:T.muted, letterSpacing:"1.5px" }}>MARCH 2026</div>
+        <div style={{ fontSize:9, color:T.muted, letterSpacing:"1.5px", flexShrink:0 }}>MAR 2026</div>
       </div>
 
       {/* TABS */}
@@ -385,11 +399,11 @@ export default function App() {
       </div>
 
       {/* BODY */}
-      <div style={{ padding:"20px 24px", maxWidth:1200, margin:"0 auto" }}>
+      <div style={{ padding:"16px", maxWidth:1200, margin:"0 auto" }}>
         {data && (
           <div className="fade" key={activeId}>
             {/* STAT CARDS */}
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:1, marginBottom:16, background:T.border }}>
+            <div className="stat-grid" style={{ marginBottom:16, background:T.border }}>
               {[
                 { label:"OVERALL SENTIMENT", value:data.overallSentiment, color:sentimentColor(data.overallSentiment) },
                 { label:"SENTIMENT SCORE", value:`${data.sentimentScore}/100`, color:sentimentColor(data.overallSentiment), bar:true },
@@ -411,7 +425,7 @@ export default function App() {
             </div>
 
             {/* MAIN GRID */}
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 320px", gap:16 }}>
+            <div className="main-grid">
               <div>
                 <div style={{ fontSize:9, letterSpacing:"2px", color:T.muted, marginBottom:10 }}>CONVERSATION THEMES · {data.themes?.length||0} FOUND</div>
                 <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
