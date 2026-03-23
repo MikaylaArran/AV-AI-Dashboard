@@ -67,18 +67,27 @@ function extractSource(title) {
 }
 
 async function fetchRSS(rssUrl) {
-  const api = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&count=20`;
-  const res = await fetch(api);
+  const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
+  const res = await fetch(proxy);
   if (!res.ok) throw new Error("RSS fetch failed");
   const data = await res.json();
-  if (data.status !== "ok") throw new Error("RSS parse failed");
-  return data.items.map(item => ({
-    title: cleanTitle(item.title),
-    source: extractSource(item.title) || item.author || "",
-    link: item.link,
-    date: formatDate(item.pubDate),
-    description: item.description ? item.description.replace(/<[^>]+>/g, "").slice(0, 160) + "…" : "",
-  }));
+  const xml = data.contents;
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(xml, "text/xml");
+  const items = Array.from(doc.querySelectorAll("item"));
+  return items.slice(0, 20).map(item => {
+    const title = item.querySelector("title")?.textContent || "";
+    const link = item.querySelector("link")?.textContent || "";
+    const pubDate = item.querySelector("pubDate")?.textContent || "";
+    const description = item.querySelector("description")?.textContent || "";
+    return {
+      title: cleanTitle(title),
+      source: extractSource(title),
+      link,
+      date: formatDate(pubDate),
+      description: description.replace(/<[^>]+>/g, "").slice(0, 160) + "…",
+    };
+  });
 }
 
 function ThemeToggle({ isDark, onToggle, T }) {
