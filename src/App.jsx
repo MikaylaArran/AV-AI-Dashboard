@@ -169,7 +169,7 @@ const voiceColor = (type, T) => {
   return m[type] || T.dim;
 };
 
-const font = "'IBM Plex Mono','Fira Code','Courier New',monospace";
+const font = "'Inter','Helvetica Neue',Arial,sans-serif";
 
 function ScoreBar({ score, color, T }) {
   return (
@@ -374,8 +374,8 @@ export default function App() {
 
       {/* FOOTER */}
       <div style={{ borderTop:`1px solid ${T.border}`, padding:"10px 24px", display:"flex", justifyContent:"space-between", fontSize:9, color:T.muted, letterSpacing:"1px", background: isDark ? T.surface : T.panel, marginTop:24, transition:"background 0.3s" }}>
-        <span>ALGOVIVA AI INTELLIGENCE MONITOR · </span>
-        <span>STATIC DATA · MARCH 2026</span>
+        <span>AI INTELLIGENCE MONITOR · </span>
+        <span>MARCH 2026</span>
       </div>
     </div>
   );
