@@ -19,7 +19,7 @@ const QUERIES = [
 
 const STATIC_DATA = {
   news: {
-    overallSentiment: "POSITIVE", sentimentScore: 74, volumeSignal: "HIGH", dataQuality: "HIGH",
+    overallSentiment: "POSITIVE", sentimentScore: 74,
     oneLiner: "The AI news cycle in early 2026 is dominated by GPT-5 and Gemini Ultra 2 launches, open-source momentum from Meta and Mistral, and a wave of multimodal breakthroughs reshaping how the world interacts with AI.",
     themes: [
       {
@@ -65,7 +65,7 @@ const STATIC_DATA = {
   },
 
   ethics: {
-    overallSentiment: "CAUTIOUS", sentimentScore: 45, volumeSignal: "HIGH", dataQuality: "HIGH",
+    overallSentiment: "CAUTIOUS", sentimentScore: 45,
     oneLiner: "Responsible AI discourse in 2026 is intense and increasingly urgent — bias incidents, deepfake proliferation, and workforce displacement concerns are driving calls for binding standards beyond voluntary commitments.",
     themes: [
       {
@@ -111,7 +111,7 @@ const STATIC_DATA = {
   },
 
   tools: {
-    overallSentiment: "POSITIVE", sentimentScore: 81, volumeSignal: "HIGH", dataQuality: "HIGH",
+    overallSentiment: "POSITIVE", sentimentScore: 81,
     oneLiner: "The AI tools landscape in 2026 is exploding — coding assistants, AI agents, and multimodal platforms are reshaping developer and knowledge worker productivity, with agentic AI emerging as the defining paradigm shift.",
     themes: [
       {
@@ -157,7 +157,7 @@ const STATIC_DATA = {
   },
 
   policy: {
-    overallSentiment: "MIXED", sentimentScore: 50, volumeSignal: "HIGH", dataQuality: "HIGH",
+    overallSentiment: "MIXED", sentimentScore: 50,
     oneLiner: "AI regulation is diverging sharply in 2026 — the EU is enforcing the AI Act, the US is pursuing a lighter federal touch, China is tightening content controls, and a global governance gap is widening.",
     themes: [
       {
@@ -203,7 +203,7 @@ const STATIC_DATA = {
   },
 
   business: {
-    overallSentiment: "POSITIVE", sentimentScore: 69, volumeSignal: "HIGH", dataQuality: "HIGH",
+    overallSentiment: "POSITIVE", sentimentScore: 69,
     oneLiner: "Enterprise AI adoption is crossing the chasm in 2026 — from pilot projects to core infrastructure. ROI is becoming measurable in specific verticals, but integration complexity and change management remain significant barriers.",
     themes: [
       {
@@ -249,7 +249,7 @@ const STATIC_DATA = {
   },
 
   research: {
-    overallSentiment: "POSITIVE", sentimentScore: 88, volumeSignal: "MEDIUM", dataQuality: "HIGH",
+    overallSentiment: "POSITIVE", sentimentScore: 88,
     oneLiner: "AI research in early 2026 is producing breakthroughs at an accelerating pace — from protein structure prediction to mathematical reasoning — with the boundaries between AI research and scientific discovery increasingly blurred.",
     themes: [
       {
@@ -349,7 +349,7 @@ export default function App() {
         @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
         .fade { animation:fadeUp 0.4s ease forwards; }
         .tab:hover { background:${T.panel} !important; color:${T.bright} !important; }
-        .stat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; }
+        .stat-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:1px; }
         .main-grid { display:grid; grid-template-columns:1fr 320px; gap:16px; }
         .header-subtitle { display:block; }
         .header-title { font-size:18px; }
@@ -407,8 +407,6 @@ export default function App() {
               {[
                 { label:"OVERALL SENTIMENT", value:data.overallSentiment, color:sentimentColor(data.overallSentiment) },
                 { label:"SENTIMENT SCORE", value:`${data.sentimentScore}/100`, color:sentimentColor(data.overallSentiment), bar:true },
-                { label:"MEDIA VOLUME", value:data.volumeSignal, color:data.volumeSignal==="HIGH"?T.green:data.volumeSignal==="MEDIUM"?T.yellow:T.muted },
-                { label:"DATA QUALITY", value:data.dataQuality, color:data.dataQuality==="HIGH"?T.green:data.dataQuality==="MEDIUM"?T.yellow:T.red },
               ].map((s,i) => (
                 <div key={i} style={{ background:T.surface, padding:"16px 20px" }}>
                   <div style={{ fontSize:9, letterSpacing:"2px", color:T.muted, marginBottom:8 }}>{s.label}</div>
@@ -496,7 +494,7 @@ export default function App() {
 
       {/* FOOTER */}
       <div style={{ borderTop:`1px solid ${T.border}`, padding:"10px 24px", display:"flex", justifyContent:"space-between", fontSize:9, color:T.muted, letterSpacing:"1px", background:T.surface, marginTop:24 }}>
-        <span>AI INTELLIGENCE MONITOR · GLOBAL AI NEWS · ETHICS · TOOLS · POLICY · BUSINESS · RESEARCH</span>
+        <span>ALGOVIVA AI INTELLIGENCE MONITOR </span>
         <span>STATIC DATA · MARCH 2026</span>
       </div>
     </div>
