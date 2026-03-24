@@ -206,8 +206,7 @@ export default function App() {
           <div style={{ background:T.blue, color:"#fff", fontSize:9, letterSpacing:"2px", fontWeight:700, padding:"4px 10px", flexShrink:0 }}>LIVE</div>
           <div style={{ display:"flex", alignItems:"center", gap:10 }}>
             <img src="/Algoviva White logo.png" alt="Algoviva" style={{ height:28, filter: isDark ? "none" : "invert(1) sepia(1) saturate(2) hue-rotate(190deg)" }} />
-            <div className="header-title" style={{ fontWeight:700, color:T.bright, letterSpacing:"1px" }}>◈ AI INTELLIGENCE</div>
-            <div className="header-subtitle" style={{ fontSize:10, color:T.muted }}>GLOBAL AI MONITOR · NEWS · ETHICS · TOOLS · POLICY · BUSINESS · RESEARCH</div>
+            <div className="header-title" style={{ fontWeight:700, color:T.bright, letterSpacing:"1px" }}>AI INTELLIGENCE</div>
           </div>
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:12, flexShrink:0 }}>
@@ -315,7 +314,7 @@ export default function App() {
 
       {/* FOOTER */}
       <div style={{ borderTop:`1px solid ${T.border}`, padding:"10px 24px", display:"flex", justifyContent:"space-between", fontSize:10, color:T.muted, background: isDark ? T.surface : T.panel, marginTop:24, transition:"background 0.3s" }}>
-        <span>ALGOVIVA AI INTELLIGENCE MONITOR ·</span>
+        <span>ALGOVIVA AI INTELLIGENCE MONITOR · </span>
         <span>LIVE DATA · {new Date().toLocaleDateString("en-GB", { month:"long", year:"numeric" }).toUpperCase()}</span>
       </div>
     </div>

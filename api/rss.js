@@ -21,7 +21,11 @@ export default async function handler(req, res) {
       .replace(/&nbsp;/g, " ").replace(/&amp;/g, "&")
       .replace(/&lt;/g, "<").replace(/&gt;/g, ">")
       .replace(/&quot;/g, '"').replace(/&#39;/g, "'")
-      .replace(/\[&hellip;\]/g, "…").replace(/\[…\]/g, "…")
+      .replace(/&#8216;/g, "\u2018").replace(/&#8217;/g, "\u2019")
+      .replace(/&#8220;/g, "\u201C").replace(/&#8221;/g, "\u201D")
+      .replace(/&#8211;/g, "-").replace(/&#8212;/g, "-")
+      .replace(/&#[0-9]+;/g, " ")
+      .replace(/\[&hellip;\]/g, "...").replace(/\[…\]/g, "...")
       .replace(/https?:\/\/\S+/g, "")
       .replace(/\s+/g, " ").trim();
 
