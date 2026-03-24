@@ -204,10 +204,8 @@ export default function App() {
       <div style={{ background:T.surface, borderBottom:`1px solid ${T.border}`, padding:"12px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", boxShadow: isDark ? "none" : "0 1px 4px rgba(13,15,45,0.08)", transition:"background 0.3s" }}>
         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
           <div style={{ background:T.blue, color:"#fff", fontSize:9, letterSpacing:"2px", fontWeight:700, padding:"4px 10px", flexShrink:0 }}>LIVE</div>
-          <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-            <img src="/Algoviva White logo.png" alt="Algoviva" style={{ height:28, filter: isDark ? "none" : "invert(1) sepia(1) saturate(2) hue-rotate(190deg)" }} />
-            <div className="header-title" style={{ fontWeight:700, color:T.bright, letterSpacing:"1px" }}>AI INTELLIGENCE</div>
-          </div>
+          <img src="/Algoviva White logo.png" alt="Algoviva" style={{ height:28, filter: isDark ? "none" : "invert(1) sepia(1) saturate(2) hue-rotate(190deg)" }} />
+          <div className="header-title" style={{ fontWeight:600, color:T.bright, letterSpacing:"0.5px" }}>AI Monitor</div>
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:12, flexShrink:0 }}>
           <ThemeToggle isDark={isDark} onToggle={() => setIsDark(d => !d)} T={T} />
