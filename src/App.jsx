@@ -19,12 +19,12 @@ const LIGHT = {
 const font = "'Inter','Helvetica Neue',Arial,sans-serif";
 
 const QUERIES = [
-  { id: "news",     label: "AI News & Buzz",        icon: "◈", rss: "https://news.google.com/rss/search?q=artificial+intelligence+AI+news&hl=en-US&gl=US&ceid=US:en" },
-  { id: "ethics",   label: "Responsible AI",         icon: "◎", rss: "https://news.google.com/rss/search?q=responsible+AI+ethics+bias&hl=en-US&gl=US&ceid=US:en" },
-  { id: "tools",    label: "AI Tools & Models",      icon: "⬡", rss: "https://news.google.com/rss/search?q=AI+tools+models+LLM+ChatGPT+Claude&hl=en-US&gl=US&ceid=US:en" },
-  { id: "policy",   label: "AI Policy & Regulation", icon: "◇", rss: "https://news.google.com/rss/search?q=AI+policy+regulation+governance+law&hl=en-US&gl=US&ceid=US:en" },
-  { id: "business", label: "AI in Business",         icon: "◉", rss: "https://news.google.com/rss/search?q=AI+enterprise+business+ROI+adoption&hl=en-US&gl=US&ceid=US:en" },
-  { id: "research", label: "Research Breakthroughs", icon: "◫", rss: "https://news.google.com/rss/search?q=AI+research+breakthrough+science&hl=en-US&gl=US&ceid=US:en" },
+  { id: "news",     label: "AI News & Buzz",        icon: "◈", feeds: ["https://venturebeat.com/category/ai/feed/", "https://techcrunch.com/category/artificial-intelligence/feed/", "https://www.artificialintelligence-news.com/feed/rss/", "https://www.reddit.com/r/artificial/.rss", "https://hnrss.org/frontpage?q=AI"] },
+  { id: "ethics",   label: "Responsible AI",         icon: "◎", feeds: ["https://ainowinstitute.org/category/news/feed", "https://venturebeat.com/category/ai/feed/", "https://www.zdnet.com/topic/artificial-intelligence/rss.xml", "https://www.reddit.com/r/AIethics/.rss", "https://hnrss.org/frontpage?q=AI+ethics"] },
+  { id: "tools",    label: "AI Tools & Models",      icon: "⬡", feeds: ["https://techcrunch.com/category/artificial-intelligence/feed/", "https://www.wired.com/feed/category/artificial-intelligence/rss", "https://venturebeat.com/category/ai/feed/", "https://www.reddit.com/r/ChatGPT/.rss", "https://hnrss.org/frontpage?q=LLM+AI+tools"] },
+  { id: "policy",   label: "AI Policy & Regulation", icon: "◇", feeds: ["https://www.wired.com/feed/category/artificial-intelligence/rss", "https://ainowinstitute.org/category/news/feed", "https://www.zdnet.com/topic/artificial-intelligence/rss.xml", "https://www.reddit.com/r/AIPolicy/.rss", "https://hnrss.org/frontpage?q=AI+regulation+policy"] },
+  { id: "business", label: "AI in Business",         icon: "◉", feeds: ["https://venturebeat.com/category/ai/feed/", "https://techcrunch.com/category/artificial-intelligence/feed/", "https://www.zdnet.com/topic/artificial-intelligence/rss.xml", "https://www.reddit.com/r/MachineLearning/.rss", "https://hnrss.org/frontpage?q=AI+enterprise+business"] },
+  { id: "research", label: "Research Breakthroughs", icon: "◫", feeds: ["https://technologyreview.com/feed/", "https://www.wired.com/feed/category/artificial-intelligence/rss", "https://venturebeat.com/category/ai/feed/", "https://www.reddit.com/r/MachineLearning/.rss", "https://hnrss.org/frontpage?q=AI+research"] },
 ];
 
 const STATIC_DATA = {
@@ -76,6 +76,7 @@ async function fetchRSS(rssUrl) {
     source: item.source,
     link: item.link,
     date: formatDate(item.pubDate),
+    rawDate: item.pubDate,
     description: item.description,
   }));
 }
@@ -89,22 +90,35 @@ function ThemeToggle({ isDark, onToggle, T }) {
   );
 }
 
+function getSourceBadge(source, link) {
+  if (link && link.includes("reddit.com")) return { label: "REDDIT", color: "#FF4500" };
+  if (link && (link.includes("ycombinator.com") || link.includes("news.ycombinator"))) return { label: "HN", color: "#FF6600" };
+  return null;
+}
+
 function ArticleCard({ article, T, isDark }) {
+  const badge = getSourceBadge(article.source, article.link);
   return (
-    <a href={article.link} target="_blank" rel="noopener noreferrer" style={{ display:"block", textDecoration:"none", background: isDark ? T.surface : T.panel, border:`1px solid ${T.border}`, borderLeft:`3px solid ${T.blue}`, padding:"14px 16px", transition:"border-color 0.15s, background 0.3s", cursor:"pointer" }}
-      onMouseEnter={e => e.currentTarget.style.borderLeftColor = T.purple}
-      onMouseLeave={e => e.currentTarget.style.borderLeftColor = T.blue}
+    <a href={article.link} target="_blank" rel="noopener noreferrer"
+      style={{ display:"block", textDecoration:"none", background: isDark ? T.surface : T.panel, border:`1px solid ${T.border}`, borderLeft:`3px solid ${badge ? badge.color : T.blue}`, padding:"14px 16px", transition:"border-color 0.15s, background 0.3s", cursor:"pointer" }}
+      onMouseEnter={e => e.currentTarget.style.borderLeftColor = badge ? badge.color : T.purple}
+      onMouseLeave={e => e.currentTarget.style.borderLeftColor = badge ? badge.color : T.blue}
     >
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", gap:12, marginBottom:6 }}>
         <span style={{ fontWeight:600, color:T.bright, fontSize:13, lineHeight:1.4 }}>{article.title}</span>
-        <span style={{ fontSize:10, color:T.muted, whiteSpace:"nowrap", flexShrink:0, marginTop:2 }}>{article.date}</span>
+        <div style={{ display:"flex", alignItems:"center", gap:6, flexShrink:0 }}>
+          {badge && (
+            <span style={{ fontSize:9, letterSpacing:"1px", padding:"2px 6px", background:`${badge.color}18`, border:`1px solid ${badge.color}44`, color:badge.color, fontWeight:600 }}>{badge.label}</span>
+          )}
+          <span style={{ fontSize:10, color:T.muted, whiteSpace:"nowrap", marginTop:2 }}>{article.date}</span>
+        </div>
       </div>
       {article.description && (
         <p style={{ fontSize:12, color:T.dim, lineHeight:1.6, marginBottom:8 }}>{article.description}</p>
       )}
       <div style={{ display:"flex", alignItems:"center", gap:8 }}>
         {article.source && (
-          <span style={{ fontSize:10, color:T.blue, fontWeight:500 }}>{article.source}</span>
+          <span style={{ fontSize:10, color: badge ? badge.color : T.blue, fontWeight:500 }}>{article.source}</span>
         )}
         <span style={{ fontSize:10, color:T.muted }}>↗ Read article</span>
       </div>
@@ -138,16 +152,27 @@ export default function App() {
   const staticData = STATIC_DATA[activeId];
 
   useEffect(() => {
-    if (articles[activeId]) return; // already fetched
+    if (articles[activeId]) return;
     setLoading(l => ({ ...l, [activeId]: true }));
     setErrors(e => ({ ...e, [activeId]: null }));
-    fetchRSS(activeQuery.rss)
-      .then(items => {
-        setArticles(a => ({ ...a, [activeId]: items }));
-        setLoading(l => ({ ...l, [activeId]: false }));
-      })
-      .catch(err => {
-        setErrors(e => ({ ...e, [activeId]: "Could not load articles. Please try again." }));
+    const feeds = activeQuery.feeds;
+    Promise.allSettled(feeds.map(url => fetchRSS(url)))
+      .then(results => {
+        const all = results
+          .filter(r => r.status === "fulfilled")
+          .flatMap(r => r.value);
+        // Deduplicate by title and sort by date descending
+        const seen = new Set();
+        const unique = all.filter(a => {
+          if (seen.has(a.title)) return false;
+          seen.add(a.title);
+          return true;
+        }).sort((a, b) => new Date(b.rawDate) - new Date(a.rawDate)).slice(0, 20);
+        if (unique.length === 0) {
+          setErrors(e => ({ ...e, [activeId]: "Could not load articles. Please try again." }));
+        } else {
+          setArticles(a => ({ ...a, [activeId]: unique }));
+        }
         setLoading(l => ({ ...l, [activeId]: false }));
       });
   }, [activeId]);
@@ -290,7 +315,7 @@ export default function App() {
 
       {/* FOOTER */}
       <div style={{ borderTop:`1px solid ${T.border}`, padding:"10px 24px", display:"flex", justifyContent:"space-between", fontSize:10, color:T.muted, background: isDark ? T.surface : T.panel, marginTop:24, transition:"background 0.3s" }}>
-        <span>ALGOVIVA AI INTELLIGENCE MONITOR · </span>
+        <span>ALGOVIVA AI INTELLIGENCE MONITOR ·</span>
         <span>LIVE DATA · {new Date().toLocaleDateString("en-GB", { month:"long", year:"numeric" }).toUpperCase()}</span>
       </div>
     </div>
