@@ -67,27 +67,17 @@ function extractSource(title) {
 }
 
 async function fetchRSS(rssUrl) {
-  const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
-  const res = await fetch(proxy);
+  const res = await fetch(`/api/rss?url=${encodeURIComponent(rssUrl)}`);
   if (!res.ok) throw new Error("RSS fetch failed");
   const data = await res.json();
-  const xml = data.contents;
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(xml, "text/xml");
-  const items = Array.from(doc.querySelectorAll("item"));
-  return items.slice(0, 20).map(item => {
-    const title = item.querySelector("title")?.textContent || "";
-    const link = item.querySelector("link")?.textContent || "";
-    const pubDate = item.querySelector("pubDate")?.textContent || "";
-    const description = item.querySelector("description")?.textContent || "";
-    return {
-      title: cleanTitle(title),
-      source: extractSource(title),
-      link,
-      date: formatDate(pubDate),
-      description: description.replace(/<[^>]+>/g, "").slice(0, 160) + "…",
-    };
-  });
+  if (data.error) throw new Error(data.error);
+  return data.items.map(item => ({
+    title: item.title,
+    source: item.source,
+    link: item.link,
+    date: formatDate(item.pubDate),
+    description: item.description,
+  }));
 }
 
 function ThemeToggle({ isDark, onToggle, T }) {
@@ -300,7 +290,7 @@ export default function App() {
 
       {/* FOOTER */}
       <div style={{ borderTop:`1px solid ${T.border}`, padding:"10px 24px", display:"flex", justifyContent:"space-between", fontSize:10, color:T.muted, background: isDark ? T.surface : T.panel, marginTop:24, transition:"background 0.3s" }}>
-        <span>ALGOVIVA AI INTELLIGENCE MONITOR · </span>
+        <span>AI INTELLIGENCE MONITOR · </span>
         <span>LIVE DATA · {new Date().toLocaleDateString("en-GB", { month:"long", year:"numeric" }).toUpperCase()}</span>
       </div>
     </div>
