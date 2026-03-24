@@ -51,11 +51,15 @@ export default async function handler(req, res) {
     const getExcerpt = (block, title) => {
       const raw = getRaw(block, "description");
       if (!raw) return "";
+      // For Google News the description is just an HTML anchor + font tag — no real text
+      // Detect this early: if the cleaned text starts with the title, skip it
       const text = clean(raw);
       if (!text || text.length < 15) return "";
       const titleNorm = title.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 50);
       const descNorm  = text.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 50);
       if (titleNorm.length > 20 && descNorm.startsWith(titleNorm.slice(0, 40))) return "";
+      // Also skip if text looks like raw HTML leaking through
+      if (text.includes("href=") || text.includes("<a ") || text.includes("&nbsp;")) return "";
       const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
       if (sentences.length >= 2) {
         const excerpt = sentences.slice(0, 3).join(" ").trim();
