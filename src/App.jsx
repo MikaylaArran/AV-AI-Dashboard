@@ -19,12 +19,48 @@ const LIGHT = {
 const font = "'Inter','Helvetica Neue',Arial,sans-serif";
 
 const QUERIES = [
-  { id: "news",     label: "AI News & Buzz",        icon: "◈", feeds: ["https://venturebeat.com/category/ai/feed/", "https://techcrunch.com/category/artificial-intelligence/feed/", "https://www.artificialintelligence-news.com/feed/rss/", "https://www.reddit.com/r/artificial/.rss", "https://hnrss.org/frontpage?q=AI"] },
-  { id: "ethics",   label: "Responsible AI",         icon: "◎", feeds: ["https://ainowinstitute.org/category/news/feed", "https://venturebeat.com/category/ai/feed/", "https://www.zdnet.com/topic/artificial-intelligence/rss.xml", "https://www.reddit.com/r/AIethics/.rss", "https://hnrss.org/frontpage?q=AI+ethics"] },
-  { id: "tools",    label: "AI Tools & Models",      icon: "⬡", feeds: ["https://techcrunch.com/category/artificial-intelligence/feed/", "https://www.wired.com/feed/category/artificial-intelligence/rss", "https://venturebeat.com/category/ai/feed/", "https://www.reddit.com/r/ChatGPT/.rss", "https://hnrss.org/frontpage?q=LLM+AI+tools"] },
-  { id: "policy",   label: "AI Policy & Regulation", icon: "◇", feeds: ["https://www.wired.com/feed/category/artificial-intelligence/rss", "https://ainowinstitute.org/category/news/feed", "https://www.zdnet.com/topic/artificial-intelligence/rss.xml", "https://www.reddit.com/r/AIPolicy/.rss", "https://hnrss.org/frontpage?q=AI+regulation+policy"] },
-  { id: "business", label: "AI in Business",         icon: "◉", feeds: ["https://venturebeat.com/category/ai/feed/", "https://techcrunch.com/category/artificial-intelligence/feed/", "https://www.zdnet.com/topic/artificial-intelligence/rss.xml", "https://www.reddit.com/r/MachineLearning/.rss", "https://hnrss.org/frontpage?q=AI+enterprise+business"] },
-  { id: "research", label: "Research Breakthroughs", icon: "◫", feeds: ["https://technologyreview.com/feed/", "https://www.wired.com/feed/category/artificial-intelligence/rss", "https://venturebeat.com/category/ai/feed/", "https://www.reddit.com/r/MachineLearning/.rss", "https://hnrss.org/frontpage?q=AI+research"] },
+  { id: "news",     label: "AI News & Buzz",        icon: "◈", feeds: [
+    "https://venturebeat.com/category/ai/feed/",
+    "https://techcrunch.com/category/artificial-intelligence/feed/",
+    "https://www.artificialintelligence-news.com/feed/rss/",
+    "https://www.reddit.com/r/artificial/.rss",
+    "https://hnrss.org/frontpage?q=artificial+intelligence",
+  ]},
+  { id: "ethics",   label: "Responsible AI",         icon: "◎", feeds: [
+    "https://ainowinstitute.org/category/news/feed",
+    "https://www.reddit.com/r/AIethics/.rss",
+    "https://hnrss.org/frontpage?q=AI+ethics+bias+safety",
+    "https://news.google.com/rss/search?q=responsible+AI+ethics+deepfake+bias&hl=en-US&gl=US&ceid=US:en",
+    "https://www.technologyreview.com/topic/the-algorithm/feed",
+  ]},
+  { id: "tools",    label: "AI Tools & Models",      icon: "⬡", feeds: [
+    "https://www.reddit.com/r/ChatGPT/.rss",
+    "https://www.reddit.com/r/LocalLLaMA/.rss",
+    "https://hnrss.org/frontpage?q=LLM+Claude+GPT+Gemini+model",
+    "https://news.google.com/rss/search?q=AI+tools+models+LLM+Claude+GPT+release&hl=en-US&gl=US&ceid=US:en",
+    "https://techcrunch.com/category/artificial-intelligence/feed/",
+  ]},
+  { id: "policy",   label: "AI Policy & Regulation", icon: "◇", feeds: [
+    "https://www.reddit.com/r/AIPolicy/.rss",
+    "https://hnrss.org/frontpage?q=AI+regulation+policy+law+governance",
+    "https://news.google.com/rss/search?q=AI+regulation+policy+EU+AI+Act+governance&hl=en-US&gl=US&ceid=US:en",
+    "https://ainowinstitute.org/category/news/feed",
+    "https://www.wired.com/feed/category/artificial-intelligence/rss",
+  ]},
+  { id: "business", label: "AI in Business",         icon: "◉", feeds: [
+    "https://venturebeat.com/category/ai/feed/",
+    "https://hnrss.org/frontpage?q=AI+enterprise+ROI+startup+investment",
+    "https://news.google.com/rss/search?q=AI+enterprise+business+ROI+adoption+investment&hl=en-US&gl=US&ceid=US:en",
+    "https://www.reddit.com/r/singularity/.rss",
+    "https://techcrunch.com/category/artificial-intelligence/feed/",
+  ]},
+  { id: "research", label: "Research Breakthroughs", icon: "◫", feeds: [
+    "https://www.technologyreview.com/feed/",
+    "https://www.reddit.com/r/MachineLearning/.rss",
+    "https://hnrss.org/frontpage?q=AI+research+paper+breakthrough+arxiv",
+    "https://news.google.com/rss/search?q=AI+research+breakthrough+machine+learning+paper&hl=en-US&gl=US&ceid=US:en",
+    "https://www.wired.com/feed/category/artificial-intelligence/rss",
+  ]},
 ];
 
 const STATIC_DATA = {
@@ -161,10 +197,9 @@ export default function App() {
         const all = results
           .filter(r => r.status === "fulfilled")
           .flatMap(r => r.value);
-        // Deduplicate by title and sort by date descending
         const seen = new Set();
         const unique = all.filter(a => {
-          if (seen.has(a.title)) return false;
+          if (!a.title || seen.has(a.title)) return false;
           seen.add(a.title);
           return true;
         }).sort((a, b) => new Date(b.rawDate) - new Date(a.rawDate)).slice(0, 20);
@@ -312,7 +347,7 @@ export default function App() {
 
       {/* FOOTER */}
       <div style={{ borderTop:`1px solid ${T.border}`, padding:"10px 24px", display:"flex", justifyContent:"space-between", fontSize:10, color:T.muted, background: isDark ? T.surface : T.panel, marginTop:24, transition:"background 0.3s" }}>
-        <span>ALGOVIVA AI INTELLIGENCE MONITOR · </span>
+        <span>AI INTELLIGENCE MONITOR · </span>
         <span>LIVE DATA · {new Date().toLocaleDateString("en-GB", { month:"long", year:"numeric" }).toUpperCase()}</span>
       </div>
     </div>
